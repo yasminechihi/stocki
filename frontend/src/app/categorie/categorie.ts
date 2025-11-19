@@ -28,29 +28,6 @@ export class Categorie implements OnInit {
     this.loadCategories();
   }
 
-<<<<<<< HEAD
-  async loadCategories() {
-    try {
-      console.log('🔄 Début du chargement des catégories...');
-      
-      const response = await fetch("http://localhost:3001/categories");
-      
-      console.log('📡 Statut de la réponse:', response.status);
-      
-      if (!response.ok) {
-        throw new Error("Erreur HTTP : " + response.status);
-      }
-
-      const data = await response.json();
-      console.log('📦 Données reçues:', data);
-      
-      this.categories = data;
-      console.log('✅ Catégories chargées:', this.categories.length);
-      
-    } catch (error) {
-      console.error("❌ Erreur lors du chargement :", error);
-    }
-=======
   loadUserData(): void {
     this.currentUser = this.authService.getCurrentUser();
   }
@@ -79,19 +56,25 @@ export class Categorie implements OnInit {
 
   private async loadCategoriesLegacy() {
     try {
+      console.log('🔄 Début du chargement des catégories...');
+      
       const response = await fetch("http://localhost:3001/categories");
-      if (response.ok) {
-        const data = await response.json();
-        this.categories = data;
+      
+      console.log('📡 Statut de la réponse:', response.status);
+      
+      if (!response.ok) {
+        throw new Error("Erreur HTTP : " + response.status);
       }
-    } catch (error) {
-      console.error("Erreur chargement legacy:", error);
-    }
-  }
 
-  editCategory(id: number) {
-    alert("Modifier catégorie ID : " + id);
->>>>>>> 5dcd4028831af8dd9b82a9642f57b6b34ff1eb62
+      const data = await response.json();
+      console.log('📦 Données reçues:', data);
+      
+      this.categories = data;
+      console.log('✅ Catégories chargées:', this.categories.length);
+      
+    } catch (error) {
+      console.error("❌ Erreur lors du chargement :", error);
+    }
   }
 
   editCategory(category: any) {
@@ -99,7 +82,6 @@ export class Categorie implements OnInit {
     this.showEditPopup = true;
   }
 
-<<<<<<< HEAD
   deleteCategory(category: any) {
     this.selectedCategory = category;
     this.showDeletePopup = true;
@@ -206,10 +188,10 @@ export class Categorie implements OnInit {
       description: '' 
     };
     this.showEditPopup = true;
-=======
+  }
+
   logout(): void {
     this.authService.logout();
     window.location.href = '/';
->>>>>>> 5dcd4028831af8dd9b82a9642f57b6b34ff1eb62
   }
 }

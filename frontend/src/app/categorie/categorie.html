@@ -12,7 +12,6 @@
     <div class="user-info">
       <img src="assets/user.jpg" />
       <span *ngIf="currentUser">Bonjour {{ currentUser.name }}</span>
-      <span *ngIf="!currentUser">Chargement...</span>
       <button class="logout-btn" (click)="logout()">Déconnexion</button>
     </div>
   </header>
@@ -35,12 +34,14 @@
     <!-- CONTENT RIGHT -->
     <main class="content">
 
+      <!-- SECTION BIENVENUE -->
       <div class="welcome-section" *ngIf="currentUser">
         <h2>Vos Catégories, {{ currentUser.name }}</h2>
       </div>
 
+      <!-- LOADING -->
       <div class="loading" *ngIf="isLoading">
-        Chargement de vos catégories...
+        <p>Chargement des catégories...</p>
       </div>
 
       <!-- LISTE DES CATÉGORIES -->
@@ -58,7 +59,7 @@
 
         <div class="item-row" *ngFor="let c of categories">
           <div class="col code">{{ c.code }}</div>
-          <div class="col name">{{ c.nom }}</div>
+          <div class="col name">{{ c.nom || c.name }}</div>
           <div class="col description">{{ c.description }}</div>
 
           <div class="col actions">
@@ -68,7 +69,7 @@
         </div>
 
         <!-- Message si aucune catégorie -->
-        <div class="no-data" *ngIf="categories.length === 0">
+        <div class="no-data" *ngIf="categories.length === 0 && !isLoading">
           Aucune catégorie trouvée. Créez votre première catégorie!
         </div>
 
@@ -81,7 +82,7 @@
   <!-- POPUP DE MODIFICATION -->
   <div class="popup-overlay" *ngIf="showEditPopup">
     <div class="popup">
-      <h3>Modifier la catégorie</h3>
+      <h3>{{ selectedCategory?.id === 0 ? 'Ajouter' : 'Modifier' }} la catégorie</h3>
       <div class="popup-content">
         <div class="form-group">
           <label>Code:</label>
@@ -91,6 +92,7 @@
             #codeInput
             (input)="updateCategoryField('code', codeInput.value)"
             class="form-input"
+            placeholder="Entrez le code"
           >
         </div>
         <div class="form-group">
@@ -101,6 +103,7 @@
             #nameInput
             (input)="updateCategoryField('nom', nameInput.value)"
             class="form-input"
+            placeholder="Entrez le nom"
           >
         </div>
         <div class="form-group">
@@ -109,6 +112,7 @@
             #descTextarea
             (input)="updateCategoryField('description', descTextarea.value)"
             class="form-textarea"
+            placeholder="Entrez la description"
           >{{ selectedCategory?.description }}</textarea>
         </div>
       </div>
@@ -124,7 +128,7 @@
     <div class="popup">
       <h3>Confirmer la suppression</h3>
       <div class="popup-content">
-        <p>Êtes-vous sûr de vouloir supprimer la catégorie <strong>"{{ selectedCategory?.nom }}"</strong> ?</p>
+        <p>Êtes-vous sûr de vouloir supprimer la catégorie <strong>"{{ selectedCategory?.nom || selectedCategory?.name }}"</strong> ?</p>
         <p class="warning-text">Cette action est irréversible !</p>
       </div>
       <div class="popup-actions">
