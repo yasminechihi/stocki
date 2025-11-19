@@ -126,15 +126,15 @@ html, body {
 
 .menu > li:hover {
   background: #34495e;
-  border-left-color: #3498db;
   color: white;
+  border-radius: 10px;
 }
 
 .menu > li.active {
-  background: #3498db;
-  border-left-color: #2980b9;
+  background: #34495e;
   font-weight: 600;
   color: white;
+  border-radius: 10px;
 }
 
 .nav-link {
@@ -214,10 +214,10 @@ html, body {
 
 .col.code {
   font-size: 0.95rem;
-  color: #e74c3c; /* Rouge visible pour les codes */
+  color: #5a6c7d; /* Rouge visible pour les codes */
   font-weight: 600; /* Plus épais */
   font-family: 'Courier New', monospace;
-  background: rgba(231, 76, 60, 0.05);
+
   padding: 6px 10px;
   border-radius: 6px;
   display: inline-block;
@@ -237,8 +237,8 @@ html, body {
   align-items: center;
 }
 
-/* ACTIONS ICONS */
-.col.actions i {
+/* STYLES POUR LES NOUVELLES ICÔNES EMOJI */
+.icon-btn {
   cursor: pointer;
   padding: 10px;
   border-radius: 6px;
@@ -249,28 +249,29 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
+  border: 1px solid transparent;
 }
 
-.fa-edit {
-  color: #e67e22; /* Orange visible */
-  background: rgba(230, 126, 34, 0.15); /* Fond plus visible */
+.edit-btn {
+  color: #e67e22;
+  background: rgba(230, 126, 34, 0.15);
   border: 1px solid rgba(230, 126, 34, 0.3);
 }
 
-.fa-edit:hover {
+.edit-btn:hover {
   background: #e67e22;
   color: white;
   transform: scale(1.1);
   box-shadow: 0 4px 12px rgba(230, 126, 34, 0.4);
 }
 
-.fa-trash {
-  color: #e74c3c; /* Rouge visible */
-  background: rgba(231, 76, 60, 0.15); /* Fond plus visible */
+.delete-btn {
+  color: #e74c3c;
+  background: rgba(231, 76, 60, 0.15);
   border: 1px solid rgba(231, 76, 60, 0.3);
 }
 
-.fa-trash:hover {
+.delete-btn:hover {
   background: #e74c3c;
   color: white;
   transform: scale(1.1);
@@ -343,6 +344,7 @@ html, body {
     font-size: 0.9rem;
     padding: 4px 8px;
   }
+<<<<<<< HEAD
 }
 .logout-btn {
   background: #ff4757;
@@ -382,4 +384,10 @@ html, body {
   padding: 40px;
   color: #999;
   font-style: italic;
+=======
+  .col.col.name {
+    font-size: 0.9rem;
+    padding: 4px 8px;
+  }
+>>>>>>> 29bc96952be1bbc1d8c0c42b17c4ec244e9415ff
 }

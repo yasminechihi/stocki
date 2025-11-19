@@ -7,7 +7,6 @@
         <img src="assets/logo.png" class="logo-img" />
         <span class="logo-text">Stocki</span>
       </div>
-      <input type="text" class="search" placeholder="Recherche..." />
     </div>
 
     <div class="user-info">
@@ -63,8 +62,8 @@
           <div class="col description">{{ c.description }}</div>
 
           <div class="col actions">
-            <i class="fa fa-edit" (click)="editCategory(c.id)"></i>
-            <i class="fa fa-trash" (click)="deleteCategory(c.id)"></i>
+            <span class="icon-btn edit-btn" (click)="editCategory(c.id)">✏️</span>
+            <span class="icon-btn delete-btn" (click)="deleteCategory(c.id)">🗑️</span>
           </div>
         </div>
 
