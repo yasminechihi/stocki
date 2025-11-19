@@ -22,13 +22,10 @@
     <aside class="sidebar">
       <ul class="menu">
         <li>📊 Tableau de bord</li>
-
         <li><a routerLink="/magasin" class="nav-link">🏪 Magasins</a></li>
-
         <li class="active">
           <a routerLink="/categorie" class="nav-link">📂 Catégories</a>
         </li>
-
         <li><a routerLink="/produit" class="nav-link">📦 Produits</a></li>
       </ul>
     </aside>
@@ -43,7 +40,10 @@
           <div class="col code">Code</div>
           <div class="col name">Nom</div>
           <div class="col description">Description</div>
-          <div class="col actions">Actions</div>
+          <div class="col actions">
+            Actions
+            <span class="icon-btn add-btn" (click)="addCategory()" title="Ajouter une catégorie">➕</span>
+          </div>
         </div>
 
         <div class="item-row" *ngFor="let c of categories">
@@ -52,8 +52,8 @@
           <div class="col description">{{ c.description }}</div>
 
           <div class="col actions">
-            <span class="icon-btn edit-btn" (click)="editCategory(c.id)">✏️</span>
-            <span class="icon-btn delete-btn" (click)="deleteCategory(c.id)">🗑️</span>
+            <span class="icon-btn edit-btn" (click)="editCategory(c)">✏️</span>
+            <span class="icon-btn delete-btn" (click)="deleteCategory(c)">🗑️</span>
           </div>
         </div>
 
@@ -66,6 +66,62 @@
 
     </main>
 
+  </div>
+
+  <!-- POPUP DE MODIFICATION -->
+  <div class="popup-overlay" *ngIf="showEditPopup">
+    <div class="popup">
+      <h3>Modifier la catégorie</h3>
+      <div class="popup-content">
+        <div class="form-group">
+          <label>Code:</label>
+          <input 
+            type="text" 
+            [value]="selectedCategory?.code" 
+            #codeInput
+            (input)="updateCategoryField('code', codeInput.value)"
+            class="form-input"
+          >
+        </div>
+        <div class="form-group">
+          <label>Nom:</label>
+          <input 
+            type="text" 
+            [value]="selectedCategory?.nom" 
+            #nameInput
+            (input)="updateCategoryField('nom', nameInput.value)"
+            class="form-input"
+          >
+        </div>
+        <div class="form-group">
+          <label>Description:</label>
+          <textarea 
+            #descTextarea
+            (input)="updateCategoryField('description', descTextarea.value)"
+            class="form-textarea"
+          >{{ selectedCategory?.description }}</textarea>
+        </div>
+      </div>
+      <div class="popup-actions">
+        <button class="btn btn-cancel" (click)="closePopups()">Annuler</button>
+        <button class="btn btn-confirm" (click)="confirmEdit()">Confirmer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- POPUP DE SUPPRESSION -->
+  <div class="popup-overlay" *ngIf="showDeletePopup">
+    <div class="popup">
+      <h3>Confirmer la suppression</h3>
+      <div class="popup-content">
+        <p>Êtes-vous sûr de vouloir supprimer la catégorie <strong>"{{ selectedCategory?.nom }}"</strong> ?</p>
+        <p class="warning-text">Cette action est irréversible !</p>
+      </div>
+      <div class="popup-actions">
+        <button class="btn btn-cancel" (click)="closePopups()">Annuler</button>
+        <button class="btn btn-danger" (click)="confirmDelete()">Supprimer</button>
+      </div>
+    </div>
   </div>
 
 </div>
