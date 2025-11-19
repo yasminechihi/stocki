@@ -11,7 +11,9 @@
 
     <div class="user-info">
       <img src="assets/user.jpg" />
-      <span>Bonjour Adélaïde Bourgois</span>
+      <span *ngIf="currentUser">Bonjour {{ currentUser.name }}</span>
+      <span *ngIf="!currentUser">Chargement...</span>
+      <button class="logout-btn" (click)="logout()">Déconnexion</button>
     </div>
   </header>
 
@@ -33,8 +35,16 @@
     <!-- CONTENT RIGHT -->
     <main class="content">
 
+      <div class="welcome-section" *ngIf="currentUser">
+        <h2>Vos Catégories, {{ currentUser.name }}</h2>
+      </div>
+
+      <div class="loading" *ngIf="isLoading">
+        Chargement de vos catégories...
+      </div>
+
       <!-- LISTE DES CATÉGORIES -->
-      <div class="category-list">
+      <div class="category-list" *ngIf="!isLoading">
 
         <div class="item-row header-row">
           <div class="col code">Code</div>
@@ -59,7 +69,7 @@
 
         <!-- Message si aucune catégorie -->
         <div class="no-data" *ngIf="categories.length === 0">
-          Aucune catégorie trouvée
+          Aucune catégorie trouvée. Créez votre première catégorie!
         </div>
 
       </div>

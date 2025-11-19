@@ -17,7 +17,9 @@
 
     <div class="user-info">
       <img src="assets/user.jpg" alt="user" />
-      <span>Bonjour Adélaïde Bourgois</span>
+      <span *ngIf="currentUser">Bonjour {{ currentUser.name }}</span>
+      <span *ngIf="!currentUser">Chargement...</span>
+      <button class="logout-btn" (click)="logout()">Déconnexion</button>
     </div>
   </header>
 
@@ -31,36 +33,39 @@
         <li class="active">
           <a routerLink="/magasin" class="nav-link">🏪 Magasins</a>
         </li>
-        <ul class="submenu">
-        </ul>
         
         <li>
-          <a routerLink="/categorie" class="nav-link">📂 Catégories</a> <!-- ← CORRIGÉ -->
+          <a routerLink="/categorie" class="nav-link">📂 Catégories</a>
         </li>
-        <ul class="submenu">
-        </ul>
         
         <li>
           <a routerLink="/produit" class="nav-link">📦 Produits</a>
         </li>
-        <ul class="submenu">
-        </ul>
       </ul>
     </aside>
 
     <!-- MAIN CONTENT -->
     <main class="main-content">
-      <section class="product-list">
+      <div class="welcome-section" *ngIf="currentUser">
+        <h2>Bienvenue, {{ currentUser.name }}!</h2>
+        <p>Voici vos produits</p>
+      </div>
+
+      <div class="loading" *ngIf="isLoading">
+        Chargement de vos produits...
+      </div>
+
+      <section class="product-list" *ngIf="!isLoading">
         <div class="product-item" *ngFor="let p of produits">
           <div class="col image">
-            <img [src]="p.image" alt="produit" />
+            <img [src]="p.image || 'assets/default-product.png'" alt="produit" />
           </div>
           <div class="col name">{{ p.nom }}</div>
           <div class="col code">{{ p.code }}</div>
           <div class="col type">
             <button [ngClass]="p.type" class="btn-type">{{ p.type }}</button>
           </div>
-          <div class="col price">{{ p.adresse }}</div>
+          <div class="col price">{{ p.adresse || p.prix }}</div>
           <div class="col actions">
             <button class="minus">−</button>
             <button class="plus">＋</button>
@@ -68,6 +73,10 @@
             <button class="edit">✏️</button>
             <button class="delete">🗑️</button>
           </div>
+        </div>
+
+        <div class="no-data" *ngIf="produits.length === 0">
+          Aucun produit trouvé. Ajoutez votre premier produit!
         </div>
       </section>
     </main>

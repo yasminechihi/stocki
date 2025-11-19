@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
@@ -68,6 +68,44 @@ export class AuthService {
   // MÉTHODE POUR LE CONTACT
   contact(contactData: any): Observable<ContactResponse> {
     return this.http.post<ContactResponse>(`${this.apiUrl}/contact`, contactData);
+  }
+
+  // NOUVELLES MÉTHODES POUR LES DONNÉES UTILISATEUR
+  getMagasins(): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.get(`${this.apiUrl}/magasins`, { headers });
+  }
+
+  getCategories(): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.get(`${this.apiUrl}/categories`, { headers });
+  }
+
+  getProduits(): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.get(`${this.apiUrl}/produits`, { headers });
+  }
+
+  addMagasin(magasinData: any): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.post(`${this.apiUrl}/magasins`, magasinData, { headers });
+  }
+
+  addCategorie(categorieData: any): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.post(`${this.apiUrl}/categories`, categorieData, { headers });
+  }
+
+  addProduit(produitData: any): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.post(`${this.apiUrl}/produits`, produitData, { headers });
+  }
+
+  private getAuthHeaders(): HttpHeaders {
+    const token = this.getToken();
+    return new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
   }
 
   private setSession(authResult: AuthResponse): void {

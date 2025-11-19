@@ -20,10 +20,23 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-// Debug de la configuration email
-console.log('🔧 Configuration email:');
-console.log('   User:', process.env.GMAIL_USER);
-console.log('   Pass configurée:', process.env.GMAIL_APP_PASSWORD ? 'OUI' : 'NON');
+// Middleware pour vérifier le token JWT
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).json({ message: "Token d'accès requis" });
+  }
+
+  jwt.verify(token, process.env.JWT_SECRET || 'votre_secret_jwt', (err, user) => {
+    if (err) {
+      return res.status(403).json({ message: "Token invalide" });
+    }
+    req.user = user;
+    next();
+  });
+};
 
 // Route de test
 app.get("/", (req, res) => {
@@ -213,7 +226,11 @@ app.post("/api/verify-login", (req, res) => {
       
       // Générer le token JWT
       const token = jwt.sign(
-        { userId: user.id, email: user.email },
+        { 
+          userId: user.id, 
+          email: user.email,
+          name: user.name 
+        },
         process.env.JWT_SECRET || 'votre_secret_jwt',
         { expiresIn: '24h' }
       );
@@ -350,6 +367,116 @@ app.post("/api/resend-2fa", (req, res) => {
   });
 });
 
+// ROUTES POUR LES DONNÉES UTILISATEUR
+
+// Route pour les magasins de l'utilisateur
+app.get("/api/magasins", authenticateToken, (req, res) => {
+  const userId = req.user.userId;
+  
+  conn.query("SELECT * FROM magasins WHERE user_id = ?", [userId], (err, results) => {
+    if (err) {
+      console.error("❌ Erreur récupération magasins:", err);
+      return res.status(500).json({ message: "Erreur serveur" });
+    }
+    
+    res.json(results);
+  });
+});
+
+// Route pour les catégories de l'utilisateur
+app.get("/api/categories", authenticateToken, (req, res) => {
+  const userId = req.user.userId;
+  
+  conn.query("SELECT * FROM categories WHERE user_id = ?", [userId], (err, results) => {
+    if (err) {
+      console.error("❌ Erreur récupération catégories:", err);
+      return res.status(500).json({ message: "Erreur serveur" });
+    }
+    
+    res.json(results);
+  });
+});
+
+// Route pour les produits de l'utilisateur
+app.get("/api/produits", authenticateToken, (req, res) => {
+  const userId = req.user.userId;
+  
+  conn.query("SELECT * FROM produits WHERE user_id = ?", [userId], (err, results) => {
+    if (err) {
+      console.error("❌ Erreur récupération produits:", err);
+      return res.status(500).json({ message: "Erreur serveur" });
+    }
+    
+    res.json(results);
+  });
+});
+
+// Route pour ajouter un magasin
+app.post("/api/magasins", authenticateToken, (req, res) => {
+  const userId = req.user.userId;
+  const { nom, code, type, adresse, image } = req.body;
+  
+  conn.query(
+    "INSERT INTO magasins (user_id, nom, code, type, adresse, image) VALUES (?, ?, ?, ?, ?, ?)",
+    [userId, nom, code, type, adresse, image],
+    (err, results) => {
+      if (err) {
+        console.error("❌ Erreur création magasin:", err);
+        return res.status(500).json({ message: "Erreur serveur" });
+      }
+      
+      res.status(201).json({ 
+        message: "Magasin créé avec succès",
+        magasinId: results.insertId
+      });
+    }
+  );
+});
+
+// Route pour ajouter une catégorie
+app.post("/api/categories", authenticateToken, (req, res) => {
+  const userId = req.user.userId;
+  const { nom, code, description } = req.body;
+  
+  conn.query(
+    "INSERT INTO categories (user_id, nom, code, description) VALUES (?, ?, ?, ?)",
+    [userId, nom, code, description],
+    (err, results) => {
+      if (err) {
+        console.error("❌ Erreur création catégorie:", err);
+        return res.status(500).json({ message: "Erreur serveur" });
+      }
+      
+      res.status(201).json({ 
+        message: "Catégorie créée avec succès",
+        categorieId: results.insertId
+      });
+    }
+  );
+});
+
+// Route pour ajouter un produit
+app.post("/api/produits", authenticateToken, (req, res) => {
+  const userId = req.user.userId;
+  const { nom, code, type, prix, adresse, image } = req.body;
+  
+  conn.query(
+    "INSERT INTO produits (user_id, nom, code, type, prix, adresse, image) VALUES (?, ?, ?, ?, ?, ?, ?)",
+    [userId, nom, code, type, prix, adresse, image],
+    (err, results) => {
+      if (err) {
+        console.error("❌ Erreur création produit:", err);
+        return res.status(500).json({ message: "Erreur serveur" });
+      }
+      
+      res.status(201).json({ 
+        message: "Produit créé avec succès",
+        produitId: results.insertId
+      });
+    }
+  );
+});
+
 // ROUTE FORMULAIRE DE CONTACT
 app.post("/api/contact", (req, res) => {
   const { name, email, company, subject, message } = req.body;
@@ -410,7 +537,7 @@ app.post("/api/contact", (req, res) => {
   );
 });
 
-// Route categories
+// Route categories (legacy - à supprimer progressivement)
 app.get("/categories", (req, res) => {
   console.log("📥 Requête /categories reçue");
   
@@ -423,29 +550,6 @@ app.get("/categories", (req, res) => {
     console.log(`✅ ${rows.length} catégories trouvées`);
     res.json(rows);
   });
-});
-
-// Middleware pour vérifier le token JWT
-const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-
-  if (!token) {
-    return res.status(401).json({ message: "Token d'accès requis" });
-  }
-
-  jwt.verify(token, process.env.JWT_SECRET || 'votre_secret_jwt', (err, user) => {
-    if (err) {
-      return res.status(403).json({ message: "Token invalide" });
-    }
-    req.user = user;
-    next();
-  });
-};
-
-// Route protégée exemple
-app.get("/api/protected", authenticateToken, (req, res) => {
-  res.json({ message: "Accès autorisé", user: req.user });
 });
 
 // ROUTE: Récupérer tous les contacts (pour admin)
@@ -468,4 +572,5 @@ app.listen(PORT, () => {
   console.log(`📊 Catégories: http://localhost:${PORT}/categories`);
   console.log(`📧 Contact: http://localhost:${PORT}/api/contact`);
   console.log(`🔐 Routes auth: http://localhost:${PORT}/api/register | /api/login`);
+  console.log(`🏪 Routes protégées: http://localhost:${PORT}/api/magasins | /api/categories | /api/produits`);
 });

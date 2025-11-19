@@ -323,10 +323,52 @@ html, body {
     font-size: 0.9rem;
     padding: 4px 8px;
   }
+<<<<<<< HEAD
+}
+.logout-btn {
+  background: #ff4757;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-left: 15px;
+  font-size: 14px;
+}
+
+.logout-btn:hover {
+  background: #ff3742;
+}
+
+.welcome-section {
+  margin-bottom: 20px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.welcome-section h2 {
+  margin: 0;
+  color: #333;
+}
+
+.loading {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+}
+
+.no-data {
+  text-align: center;
+  padding: 40px;
+  color: #999;
+  font-style: italic;
+=======
   .col.col.name {
     font-size: 0.9rem;
     padding: 4px 8px;
   }
+<<<<<<< HEAD
 }
 /* POPUP STYLES */
 .popup-overlay {
@@ -496,4 +538,7 @@ html, body {
   align-items: center;
   justify-content: center;
   gap: 12px;
+=======
+>>>>>>> 29bc96952be1bbc1d8c0c42b17c4ec244e9415ff
+>>>>>>> 5dcd4028831af8dd9b82a9642f57b6b34ff1eb62
 }
