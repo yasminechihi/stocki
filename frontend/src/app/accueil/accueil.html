@@ -54,7 +54,7 @@
     </div>
   </div>
 
-  <!-- Popup d'authentification -->
+  <!-- Popup d'authentification principale -->
   <div class="auth-modal-overlay" *ngIf="showAuthModal" (click)="closeAuthModal()">
     <div class="auth-modal-content" (click)="$event.stopPropagation()">
       <button class="close-auth-modal" (click)="closeAuthModal()">&times;</button>
@@ -82,13 +82,14 @@
           <button type="submit" class="auth-btn login-btn">Se connecter</button>
 
           <!-- MESSAGES D'ERREUR ET CHARGEMENT -->
-          <div *ngIf="errorMessage" class="error-message" style="color: red; text-align: center; margin-top: 1rem; padding: 10px; background: #ffe6e6; border-radius: 5px;">
+          <div *ngIf="errorMessage" class="error-message">
             {{ errorMessage }}
           </div>
-          <div *ngIf="isLoading" class="loading" style="text-align: center; margin-top: 1rem;">
-            <div style="display: inline-block; padding: 10px 20px; background: #f0f0f0; border-radius: 5px;">
-              Chargement...
-            </div>
+          <div *ngIf="successMessage" class="success-message">
+            {{ successMessage }}
+          </div>
+          <div *ngIf="isLoading" class="loading">
+            Connexion en cours...
           </div>
         </form>
         <div class="auth-switch">
@@ -135,18 +136,111 @@
           <button type="submit" class="auth-btn register-btn">S'inscrire</button>
 
           <!-- MESSAGES D'ERREUR ET CHARGEMENT -->
-          <div *ngIf="errorMessage" class="error-message" style="color: red; text-align: center; margin-top: 1rem; padding: 10px; background: #ffe6e6; border-radius: 5px;">
+          <div *ngIf="errorMessage" class="error-message">
             {{ errorMessage }}
           </div>
-          <div *ngIf="isLoading" class="loading" style="text-align: center; margin-top: 1rem;">
-            <div style="display: inline-block; padding: 10px 20px; background: #f0f0f0; border-radius: 5px;">
-              Chargement...
-            </div>
+          <div *ngIf="successMessage" class="success-message">
+            {{ successMessage }}
+          </div>
+          <div *ngIf="isLoading" class="loading">
+            Création du compte...
           </div>
         </form>
         <div class="auth-switch">
           <p>Déjà un compte? <a href="javascript:void(0)" (click)="showLogin()">Se connecter</a></p>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Popup de vérification de compte (après inscription) -->
+  <div class="auth-modal-overlay" *ngIf="showVerificationModal" (click)="closeAuthModal()">
+    <div class="auth-modal-content" (click)="$event.stopPropagation()">
+      <button class="close-auth-modal" (click)="closeAuthModal()">&times;</button>
+      
+      <div class="auth-tab">
+        <h2>Vérification du compte</h2>
+        <p class="twofa-instructions">
+          Un code de vérification a été envoyé à votre adresse email.
+          Veuillez le saisir ci-dessous pour activer votre compte.
+        </p>
+        
+        <form class="auth-form" (ngSubmit)="onVerifyAccount()">
+          <div class="form-group">
+            <input 
+              type="text" 
+              placeholder="Code de vérification à 6 chiffres" 
+              [(ngModel)]="verificationData.code"
+              name="verificationCode"
+              maxlength="6"
+              pattern="[0-9]{6}"
+              class="code-input"
+              required>
+          </div>
+          <button type="submit" class="auth-btn register-btn">Vérifier le compte</button>
+
+          <div class="resend-link">
+            <p>Vous n'avez pas reçu le code ?</p>
+            <a href="javascript:void(0)" (click)="onResendVerification()">Renvoyer le code</a>
+          </div>
+
+          <!-- MESSAGES -->
+          <div *ngIf="errorMessage" class="error-message">
+            {{ errorMessage }}
+          </div>
+          <div *ngIf="successMessage" class="success-message">
+            {{ successMessage }}
+          </div>
+          <div *ngIf="isLoading" class="loading">
+            Vérification en cours...
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Popup de double authentification (après connexion) -->
+  <div class="auth-modal-overlay" *ngIf="show2FAModal" (click)="closeAuthModal()">
+    <div class="auth-modal-content" (click)="$event.stopPropagation()">
+      <button class="close-auth-modal" (click)="closeAuthModal()">&times;</button>
+      
+      <div class="auth-tab">
+        <h2>Vérification de sécurité</h2>
+        <p class="twofa-instructions">
+          Un code de sécurité a été envoyé à votre adresse email.
+          Veuillez le saisir ci-dessous pour finaliser votre connexion.
+        </p>
+        
+        <form class="auth-form" (ngSubmit)="onVerify2FA()">
+          <div class="form-group">
+            <input 
+              type="text" 
+              placeholder="Code de sécurité à 6 chiffres" 
+              [(ngModel)]="verificationData.code"
+              name="securityCode"
+              maxlength="6"
+              pattern="[0-9]{6}"
+              class="code-input"
+              required>
+          </div>
+          <button type="submit" class="auth-btn login-btn">Vérifier et se connecter</button>
+
+          <div class="resend-link">
+            <p>Vous n'avez pas reçu le code ?</p>
+            <a href="javascript:void(0)" (click)="onResend2FA()">Renvoyer le code</a>
+          </div>
+
+          <!-- MESSAGES -->
+          <div *ngIf="errorMessage" class="error-message">
+            {{ errorMessage }}
+          </div>
+          <div *ngIf="successMessage" class="success-message">
+            {{ successMessage }}
+          </div>
+          <div *ngIf="isLoading" class="loading">
+            Vérification en cours...
+          </div>
+        </form>
       </div>
     </div>
   </div>
@@ -265,7 +359,7 @@
       <div class="footer-section">
         <h4>Support</h4>
         <a href="#" class="footer-link">Centre d'aide</a>
-        <a href="#contact" class="footer-link">Contact</a>
+        <a routerLink="/contact" class="footer-link">Contact</a>
         <a href="#" class="footer-link">Status</a>
       </div>
     </div>

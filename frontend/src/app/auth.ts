@@ -11,8 +11,12 @@ export interface User {
 
 export interface AuthResponse {
   message: string;
-  token: string;
-  user: User;
+  token?: string;
+  user?: User;
+  requiresVerification?: boolean;
+  requires2FA?: boolean;
+  userId?: string;
+  debugCode?: string;
 }
 
 export interface ContactResponse {
@@ -24,7 +28,7 @@ export interface ContactResponse {
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:3000/api';
+  private apiUrl = 'http://localhost:3001/api';
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
@@ -33,13 +37,32 @@ export class AuthService {
   }
 
   register(userData: any): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/register`, userData)
-      .pipe(tap(response => this.setSession(response)));
+    return this.http.post<AuthResponse>(`${this.apiUrl}/register`, userData);
   }
 
   login(credentials: any): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials)
-      .pipe(tap(response => this.setSession(response)));
+    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials);
+  }
+
+  verifyLogin(verificationData: any): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/verify-login`, verificationData)
+      .pipe(tap(response => {
+        if (response.token && response.user) {
+          this.setSession(response);
+        }
+      }));
+  }
+
+  verifyAccount(verificationData: any): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/verify-account`, verificationData);
+  }
+
+  resendVerification(userId: string): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/resend-verification`, { userId });
+  }
+
+  resend2FA(userId: string): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/resend-2fa`, { userId });
   }
 
   // MÉTHODE POUR LE CONTACT
@@ -48,9 +71,11 @@ export class AuthService {
   }
 
   private setSession(authResult: AuthResponse): void {
-    localStorage.setItem('token', authResult.token);
-    localStorage.setItem('user', JSON.stringify(authResult.user));
-    this.currentUserSubject.next(authResult.user);
+    if (authResult.token && authResult.user) {
+      localStorage.setItem('token', authResult.token);
+      localStorage.setItem('user', JSON.stringify(authResult.user));
+      this.currentUserSubject.next(authResult.user);
+    }
   }
 
   logout(): void {

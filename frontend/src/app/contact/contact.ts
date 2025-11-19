@@ -113,9 +113,21 @@ export class Contact {
     this.authService.login(this.loginData).subscribe({
       next: (response) => {
         this.authLoading = false;
-        console.log('Connexion réussie:', response);
-        this.closeAuthModal();
-        this.router.navigate(['/magasin']);
+        
+        if (response.requires2FA) {
+          // Rediriger vers la page de vérification 2FA
+          this.router.navigate(['/verify-2fa'], { 
+            state: { 
+              userId: response.userId,
+              debugCode: response.debugCode 
+            } 
+          });
+          this.closeAuthModal();
+        } else if (response.token) {
+          console.log('Connexion réussie:', response);
+          this.closeAuthModal();
+          this.router.navigate(['/magasin']);
+        }
       },
       error: (error) => {
         this.authLoading = false;
@@ -142,9 +154,18 @@ export class Contact {
     this.authService.register(this.registerData).subscribe({
       next: (response) => {
         this.authLoading = false;
-        console.log('Inscription réussie:', response);
-        this.closeAuthModal();
-        this.router.navigate(['/magasin']);
+        
+        if (response.requiresVerification) {
+          // Rediriger vers la page de vérification
+          this.router.navigate(['/verify-account'], { 
+            state: { userId: response.userId } 
+          });
+          this.closeAuthModal();
+        } else {
+          console.log('Inscription réussie:', response);
+          this.closeAuthModal();
+          this.router.navigate(['/magasin']);
+        }
       },
       error: (error) => {
         this.authLoading = false;
