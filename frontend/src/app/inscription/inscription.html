@@ -1,0 +1,31 @@
+<div class="container">
+  <h1 class="logo">Easy <span>📦</span> Stock</h1>
+
+  <div class="form-box">
+    <h2>créer votre compte</h2>
+
+    <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
+      <input type="text" placeholder="matricule" formControlName="matricule" />
+
+      <input type="email" placeholder="Email*" formControlName="email" />
+      <div *ngIf="signupForm.get('email')?.invalid && signupForm.get('email')?.touched" class="error">
+        ⚠️ Veuillez entrer un email valide
+      </div>
+
+      <input type="password" placeholder="mot de passe" formControlName="password" />
+      <div *ngIf="signupForm.get('password')?.invalid && signupForm.get('password')?.touched" class="error">
+        ⚠️ Le mot de passe est obligatoire
+      </div>
+
+      <input type="password" placeholder="Confirmer mot de passe" formControlName="confirmPassword" />
+      <div *ngIf="signupForm.get('confirmPassword')?.invalid && signupForm.get('confirmPassword')?.touched" class="error">
+        ⚠️ Veuillez confirmer votre mot de passe
+      </div>
+
+
+      <input type="text" placeholder="n° de tél (optionnel)" formControlName="phone" />
+
+      <button type="submit" (click)="goToConnexion()">s'inscrire</button>
+    </form>
+  </div>
+</div>

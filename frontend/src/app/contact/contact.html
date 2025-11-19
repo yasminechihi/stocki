@@ -1,0 +1,308 @@
+<header class="header">
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="logo">
+        <img src="assets/logo.png" alt="Stocki" class="logo-img">
+        <span class="logo-text">Stocki</span>
+      </div>
+      <div class="nav-menu">
+        <a routerLink="/accueil" class="nav-link">Accueil</a>
+        <a href="javascript:void(0)" class="nav-link" (click)="openAuthModal()">Stocki</a>
+        <a routerLink="/contact" class="nav-link active">Contact</a>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<main class="contact-page">
+  <!-- Hero Section -->
+  <section class="contact-hero">
+    <div class="container">
+      <div class="hero-content">
+        <h1 class="hero-title">Contactez-nous</h1>
+        <p class="hero-description">
+          Notre équipe est là pour vous accompagner dans la gestion de votre logistique. 
+          N'hésitez pas à nous contacter pour toute question.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section class="contact-section">
+    <div class="container">
+      <div class="contact-grid">
+        <!-- Contact Form -->
+        <div class="contact-form-container">
+          <h2>Envoyez-nous un message</h2>
+          <form class="contact-form" (ngSubmit)="onSubmit()" #contactForm="ngForm">
+            <div class="form-group">
+              <label for="name">Nom complet *</label>
+              <input 
+                type="text" 
+                id="name" 
+                name="name" 
+                required 
+                [(ngModel)]="contactData.name"
+                placeholder="Votre nom complet">
+            </div>
+
+            <div class="form-group">
+              <label for="email">Email *</label>
+              <input 
+                type="email" 
+                id="email" 
+                name="email" 
+                required 
+                [(ngModel)]="contactData.email"
+                placeholder="votre@email.com">
+            </div>
+
+            <div class="form-group">
+              <label for="company">Entreprise</label>
+              <input 
+                type="text" 
+                id="company" 
+                name="company" 
+                [(ngModel)]="contactData.company"
+                placeholder="Nom de votre entreprise">
+            </div>
+
+            <div class="form-group">
+              <label for="subject">Sujet *</label>
+              <select id="subject" name="subject" required [(ngModel)]="contactData.subject">
+                <option value="">Sélectionnez un sujet</option>
+                <option value="demo">Demande de démo</option>
+                <option value="support">Support technique</option>
+                <option value="partnership">Partenariat</option>
+                <option value="other">Autre</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="message">Message *</label>
+              <textarea 
+                id="message" 
+                name="message" 
+                rows="6" 
+                required 
+                [(ngModel)]="contactData.message"
+                placeholder="Décrivez votre demande..."></textarea>
+            </div>
+
+            <button type="submit" class="submit-btn" [disabled]="contactLoading">
+              {{ contactLoading ? 'Envoi en cours...' : 'Envoyer le message' }}
+            </button>
+
+            <!-- MESSAGES POUR LE FORMULAIRE DE CONTACT -->
+            <div *ngIf="contactSuccessMessage" class="success-message" style="color: green; text-align: center; margin-top: 1rem; padding: 10px; background: #f0fff0; border-radius: 5px; border: 1px solid green;">
+              {{ contactSuccessMessage }}
+            </div>
+
+            <div *ngIf="contactErrorMessage" class="error-message" style="color: red; text-align: center; margin-top: 1rem; padding: 10px; background: #ffe6e6; border-radius: 5px; border: 1px solid red;">
+              {{ contactErrorMessage }}
+            </div>
+          </form>
+        </div>
+
+        <!-- Contact Info -->
+        <div class="contact-info">
+          <h2>Nos coordonnées</h2>
+          
+          <div class="contact-method">
+            <div class="contact-icon">📧</div>
+            <div class="contact-details">
+              <h3>Email</h3>
+              <p>contact@stocki.tn</p>
+              <p>support@stocki.tn</p>
+            </div>
+          </div>
+
+          <div class="contact-method">
+            <div class="contact-icon">📞</div>
+            <div class="contact-details">
+              <h3>Téléphone</h3>
+              <p>+216 70 000 000</p>
+              <p>Lun - Ven: 9h00 - 18h00</p>
+            </div>
+          </div>
+
+          <div class="contact-method">
+            <div class="contact-icon">📍</div>
+            <div class="contact-details">
+              <h3>Adresse</h3>
+              <p>Centre Urbain Nord</p>
+              <p>1082 Tunis, Tunisie</p>
+            </div>
+          </div>
+
+          <div class="social-links">
+            <h3>Suivez-nous</h3>
+            <div class="social-icons">
+              <a href="#" class="social-link">📘</a>
+              <a href="#" class="social-link">📷</a>
+              <a href="#" class="social-link">💼</a>
+              <a href="#" class="social-link">🐦</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="faq-section">
+    <div class="container">
+      <h2>Questions fréquentes</h2>
+      <div class="faq-grid">
+        <div class="faq-item">
+          <h3>Comment démarrer avec Stocki ?</h3>
+          <p>Créez votre compte en quelques minutes et bénéficiez de notre essai gratuit de 14 jours sans engagement.</p>
+        </div>
+        
+        <div class="faq-item">
+          <h3>Quels transporteurs sont supportés ?</h3>
+          <p>Nous intégrons les principaux transporteurs tunisiens et internationaux pour un suivi unifié de vos colis.</p>
+        </div>
+        
+        <div class="faq-item">
+          <h3>Puis-je utiliser Stocki sur mobile ?</h3>
+          <p>Oui, notre application mobile est disponible sur iOS et Android pour gérer votre stock où que vous soyez.</p>
+        </div>
+        
+        <div class="faq-item">
+          <h3>Quel est le délai de mise en place ?</h3>
+          <p>La configuration initiale prend moins de 24 heures. Notre équipe vous accompagne pendant tout le processus.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Popup d'authentification -->
+  <div class="auth-modal-overlay" *ngIf="showAuthModal" (click)="closeAuthModal()">
+    <div class="auth-modal-content" (click)="$event.stopPropagation()">
+      <button class="close-auth-modal" (click)="closeAuthModal()">&times;</button>
+      
+      <!-- Onglet Connexion -->
+      <div class="auth-tab" *ngIf="showLoginTab">
+        <h2>Connexion</h2>
+        <form class="auth-form" (ngSubmit)="onLogin()">
+          <div class="form-group">
+            <input 
+              type="email" 
+              placeholder="Email" 
+              [(ngModel)]="loginData.email"
+              name="loginEmail"
+              required>
+          </div>
+          <div class="form-group">
+            <input 
+              type="password" 
+              placeholder="Mot de passe" 
+              [(ngModel)]="loginData.password"
+              name="loginPassword"
+              required>
+          </div>
+          <button type="submit" class="auth-btn login-btn" [disabled]="authLoading">
+            {{ authLoading ? 'Connexion...' : 'Se connecter' }}
+          </button>
+
+          <!-- MESSAGES POUR L'AUTHENTIFICATION -->
+          <div *ngIf="authErrorMessage" class="error-message" style="color: red; text-align: center; margin-top: 1rem; padding: 10px; background: #ffe6e6; border-radius: 5px;">
+            {{ authErrorMessage }}
+          </div>
+        </form>
+        <div class="auth-switch">
+          <p>Pas encore de compte? <a href="javascript:void(0)" (click)="showRegister()">S'inscrire</a></p>
+        </div>
+      </div>
+      
+      <!-- Onglet Inscription -->
+      <div class="auth-tab" *ngIf="!showLoginTab">
+        <h2>Inscription</h2>
+        <form class="auth-form" (ngSubmit)="onRegister()">
+          <div class="form-group">
+            <input 
+              type="text" 
+              placeholder="Nom complet" 
+              [(ngModel)]="registerData.name"
+              name="registerName"
+              required>
+          </div>
+          <div class="form-group">
+            <input 
+              type="email" 
+              placeholder="Email" 
+              [(ngModel)]="registerData.email"
+              name="registerEmail"
+              required>
+          </div>
+          <div class="form-group">
+            <input 
+              type="password" 
+              placeholder="Mot de passe" 
+              [(ngModel)]="registerData.password"
+              name="registerPassword"
+              required>
+          </div>
+          <div class="form-group">
+            <input 
+              type="password" 
+              placeholder="Confirmer le mot de passe" 
+              [(ngModel)]="registerData.confirmPassword"
+              name="registerConfirmPassword"
+              required>
+          </div>
+          <button type="submit" class="auth-btn register-btn" [disabled]="authLoading">
+            {{ authLoading ? 'Inscription...' : 'S'inscrire' }}
+          </button>
+
+          <!-- MESSAGES POUR L'AUTHENTIFICATION -->
+          <div *ngIf="authErrorMessage" class="error-message" style="color: red; text-align: center; margin-top: 1rem; padding: 10px; background: #ffe6e6; border-radius: 5px;">
+            {{ authErrorMessage }}
+          </div>
+        </form>
+        <div class="auth-switch">
+          <p>Déjà un compte? <a href="javascript:void(0)" (click)="showLogin()">Se connecter</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-content">
+      <div class="footer-section">
+        <div class="logo">
+          <span class="logo-text">Stocki</span>
+        </div>
+        <p class="footer-description">
+          La solution tout-en-un pour la gestion de stock et le suivi de colis.
+        </p>
+      </div>
+      <div class="footer-section">
+        <h4>Produit</h4>
+        <a routerLink="/fonctionnalites" class="footer-link">Fonctionnalités</a>
+        <a routerLink="/tarifs" class="footer-link">Tarifs</a>
+        <a href="#" class="footer-link">API</a>
+      </div>
+      <div class="footer-section">
+        <h4>Entreprise</h4>
+        <a routerLink="/about" class="footer-link">À propos</a>
+        <a href="#" class="footer-link">Blog</a>
+        <a href="#" class="footer-link">Carrières</a>
+      </div>
+      <div class="footer-section">
+        <h4>Support</h4>
+        <a href="#" class="footer-link">Centre d'aide</a>
+        <a routerLink="/contact" class="footer-link">Contact</a>
+        <a href="#" class="footer-link">Status</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2025 Stocki. Tous droits réservés.</p>
+    </div>
+  </div>
+</footer>

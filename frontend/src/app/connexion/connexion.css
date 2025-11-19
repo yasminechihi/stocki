@@ -1,0 +1,148 @@
+/* ----------- GLOBAL ----------- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background: linear-gradient(135deg, #eef2f7, #d9e4ec);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+/* ----------- CONTAINER ----------- */
+.container {
+  width: 100%;
+  max-width: 450px;
+  padding: 40px 30px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0px 8px 20px rgba(0,0,0,0.15);
+  text-align: center;
+  margin: auto; /* Changement important ici */
+  animation: float 4s ease-in-out infinite;
+  /* Centrage vertical amélioré */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Animation flottante */
+@keyframes float {
+  0% { transform: translate(-50%, -50%) translateY(0px); }
+  50% { transform: translate(-50%, -50%) translateY(-12px); }
+  100% { transform: translate(-50%, -50%) translateY(0px); }
+}
+
+/* ----------- LOGO ----------- */
+.logo {
+  font-size: 32px;
+  font-weight: 700;
+  color: #2d4059;
+  margin-bottom: 25px; /* Réduit pour équilibrer */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.logo span {
+  font-size: 36px;
+}
+
+/* ----------- FORM BOX ----------- */
+.form-box {
+  width: 100%;
+}
+
+.form-box h2 {
+  font-size: 22px;
+  color: #333;
+  margin-bottom: 25px;
+  font-weight: 600;
+}
+
+/* ----------- FORM ----------- */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+form input {
+  padding: 14px;
+  border: 1px solid #ccd6dd;
+  border-radius: 10px;
+  outline: none;
+  transition: 0.3s;
+  font-size: 16px;
+  width: 100%;
+}
+
+form input:focus {
+  border-color: #0077b6;
+  box-shadow: 0 0 8px rgba(0, 119, 182, 0.3);
+}
+
+/* ----------- BUTTON ----------- */
+form button {
+  background: #0077b6;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+  width: 100%;
+  margin-top: 5px; /* Réduit pour équilibrer */
+}
+
+form button:hover {
+  background: #005f86;
+  transform: scale(1.02);
+}
+
+/* ----------- RESPONSIVE ----------- */
+@media (max-width: 480px) {
+  .container {
+    padding: 30px 20px;
+    max-width: 90%;
+    position: relative;
+    top: auto;
+    left: auto;
+    transform: none;
+    margin: 20px auto;
+  }
+  
+  body {
+    display: block;
+    padding: 40px 20px;
+  }
+  
+  .logo {
+    font-size: 28px;
+    margin-bottom: 20px;
+  }
+  
+  .logo span {
+    font-size: 30px;
+  }
+  
+  form input {
+    padding: 12px;
+  }
+  
+  @keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-8px); }
+    100% { transform: translateY(0px); }
+  }
+}

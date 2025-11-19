@@ -1,0 +1,73 @@
+<div class="app-container">
+  
+  <!-- NAVBAR -->
+  <header class="navbar">
+    <div class="nav-left">
+      <div class="logo">
+        <img src="assets/logo.png" class="logo-img" />
+        <span class="logo-text">Stocki</span>
+      </div>
+      <input type="text" class="search" placeholder="Recherche..." />
+    </div>
+
+    <div class="user-info">
+      <img src="assets/user.jpg" />
+      <span>Bonjour Adélaïde Bourgois</span>
+    </div>
+  </header>
+
+  <!-- WRAPPER GLOBAL -->
+  <div class="container">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <ul class="menu">
+        <li>📊 Tableau de bord</li>
+
+        <li><a routerLink="/magasin" class="nav-link">🏪 Magasins</a></li>
+
+        <li class="active">
+          <a routerLink="/categorie" class="nav-link">📂 Catégories</a>
+        </li>
+
+        <li><a routerLink="/produit" class="nav-link">📦 Produits</a></li>
+      </ul>
+    </aside>
+
+    <!-- CONTENT RIGHT -->
+    <main class="content">
+
+      <!-- LISTE DES CATÉGORIES -->
+      <div class="category-list">
+
+        <div class="item-row header-row">
+          <div class="col code">Code</div>
+          <div class="col name">Nom</div>
+          <div class="col description">Description</div>
+          <div class="col actions">Actions</div>
+        </div>
+
+        <div class="item-row" *ngFor="let c of categories">
+          <!-- CORRECTION : Même ordre que le header -->
+          <div class="col code">{{ c.code }}</div>
+          <div class="col name">{{ c.nom }}</div>
+          <div class="col description">{{ c.description }}</div>
+
+          <div class="col actions">
+            <i class="fa fa-edit" (click)="editCategory(c.id)"></i>
+            <i class="fa fa-trash" (click)="deleteCategory(c.id)"></i>
+          </div>
+        </div>
+
+        <!-- Message si aucune catégorie -->
+        <div class="no-data" *ngIf="categories.length === 0">
+          Aucune catégorie trouvée
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+</div>

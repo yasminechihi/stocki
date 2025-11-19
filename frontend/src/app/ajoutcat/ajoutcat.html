@@ -1,0 +1,29 @@
+<div class="container">
+  <div class="form-box">
+    <h2>➕ Ajouter une catégorie</h2>
+
+    <form [formGroup]="ajoutcatForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="id">ID</label>
+        <input id="id" type="text" formControlName="id" />
+      </div>
+
+      <div class="form-group">
+        <label for="nom">Nom</label>
+        <input id="nom" type="text" formControlName="nom" />
+      </div>
+
+      <div class="form-group">
+        <label for="adresse">Description</label>
+        <input id="adresse" type="text" formControlName="adresse" />
+      </div>
+
+      <div class="form-group">
+        <label for="categorie">Produits</label>
+        <input id="adresse" type="text" formControlName="adresse" />
+      </div>
+
+      <button type="submit">Enregistrer</button>
+    </form>
+  </div>
+</div>

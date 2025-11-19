@@ -1,0 +1,129 @@
+/* ----------- GLOBAL ----------- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background: linear-gradient(135deg, #eef2f7, #d9e4ec);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+/* ----------- CONTAINER ----------- */
+.container {
+  width: 100%;
+  max-width: 450px;
+  padding: 30px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0px 8px 20px rgba(0,0,0,0.15);
+  text-align: center;
+  margin: 0 auto;
+  margin-top: 110px;
+
+  /* ✅ Animation flottante */
+  animation: float 4s ease-in-out infinite;
+}
+
+/* Animation flottante */
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+  100% { transform: translateY(0px); }
+}
+
+/* ----------- LOGO ----------- */
+.logo {
+  font-size: 28px;
+  font-weight: 700;
+  color: #2d4059;
+  margin-bottom: 20px;
+}
+.logo span {
+  font-size: 30px;
+}
+
+/* ----------- FORM ----------- */
+.form-box h2 {
+  font-size: 20px;
+  color: #333;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+form input {
+  padding: 12px;
+  border: 1px solid #ccd6dd;
+  border-radius: 10px;
+  outline: none;
+  transition: 0.3s;
+  font-size: 15px;
+}
+
+form input:focus {
+  border-color: #0077b6;
+  box-shadow: 0 0 6px rgba(0, 119, 182, 0.2);
+}
+
+/* ----------- BUTTONS ----------- */
+form button {
+  background: #0077b6;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+form button:hover {
+  background: #005f86;
+  transform: scale(1.05);
+}
+
+/* ----------- ALREADY ACCOUNT ----------- */
+.text-center {
+  margin-top: 25px;
+  font-size: 14px;
+  color: #555;
+}
+
+.text-center p {
+  margin-bottom: 10px;
+}
+
+.text-center button {
+  background: #e0e7ec;
+  color: #333;
+  font-weight: 600;
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.text-center button:hover {
+  background: #ccd6dd;
+  transform: scale(1.05);
+}
+.error small {
+  color: red;
+  font-size: 0.9em;
+  display: block;
+  margin-top: 2px;
+}

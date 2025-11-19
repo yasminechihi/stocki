@@ -1,0 +1,276 @@
+<header class="header">
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="logo">
+        <img src="assets/logo.png" alt="Stocki" class="logo-img">
+        <span class="logo-text">Stocki</span>
+      </div>
+      <div class="nav-menu">
+        <a routerLink="/accueil" class="nav-link">Accueil</a>
+        <a href="javascript:void(0)" class="nav-link" (click)="openAuthModal()">Stocki</a>
+        <a routerLink="/contact" class="nav-link">Contact</a>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<section class="hero-section">
+  <div class="hero-container">
+    <div class="hero-content">
+      <h1 class="hero-title">
+        Gérez votre stock et suivez vos colis en <span class="highlight">temps réel</span>
+      </h1>
+      <p class="hero-description">
+        Stocki vous offre une solution complète pour gérer votre inventaire, 
+        suivre vos colis et optimiser votre chaîne logistique depuis n'importe quel appareil.
+      </p>
+      <div class="hero-buttons">
+        <button class="cta-primary" (click)="startFreeTrial()">
+          Commencer gratuitement
+        </button>
+        <button class="cta-secondary" (click)="watchDemo()">
+          Voir la démo
+        </button>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-item">
+          <div class="stat-number">500+</div>
+          <div class="stat-label">Entreprises</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">50K+</div>
+          <div class="stat-label">Colis suivis</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">99%</div>
+          <div class="stat-label">Satisfaction</div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-image">
+      <div class="dashboard-preview">
+        <img src="assets/pic.webp" alt="Aperçu du tableau de bord Stocki" class="dashboard-image">
+      </div>
+    </div>
+  </div>
+
+  <!-- Popup d'authentification -->
+  <div class="auth-modal-overlay" *ngIf="showAuthModal" (click)="closeAuthModal()">
+    <div class="auth-modal-content" (click)="$event.stopPropagation()">
+      <button class="close-auth-modal" (click)="closeAuthModal()">&times;</button>
+      
+      <!-- Onglet Connexion -->
+      <div class="auth-tab" *ngIf="showLoginTab">
+        <h2>Connexion</h2>
+        <form class="auth-form" (ngSubmit)="onLogin()">
+          <div class="form-group">
+            <input 
+              type="email" 
+              placeholder="Email" 
+              [(ngModel)]="loginData.email"
+              name="loginEmail"
+              required>
+          </div>
+          <div class="form-group">
+            <input 
+              type="password" 
+              placeholder="Mot de passe" 
+              [(ngModel)]="loginData.password"
+              name="loginPassword"
+              required>
+          </div>
+          <button type="submit" class="auth-btn login-btn">Se connecter</button>
+
+          <!-- MESSAGES D'ERREUR ET CHARGEMENT -->
+          <div *ngIf="errorMessage" class="error-message" style="color: red; text-align: center; margin-top: 1rem; padding: 10px; background: #ffe6e6; border-radius: 5px;">
+            {{ errorMessage }}
+          </div>
+          <div *ngIf="isLoading" class="loading" style="text-align: center; margin-top: 1rem;">
+            <div style="display: inline-block; padding: 10px 20px; background: #f0f0f0; border-radius: 5px;">
+              Chargement...
+            </div>
+          </div>
+        </form>
+        <div class="auth-switch">
+          <p>Pas encore de compte? <a href="javascript:void(0)" (click)="showRegister()">S'inscrire</a></p>
+        </div>
+      </div>
+      
+      <!-- Onglet Inscription -->
+      <div class="auth-tab" *ngIf="!showLoginTab">
+        <h2>Inscription</h2>
+        <form class="auth-form" (ngSubmit)="onRegister()">
+          <div class="form-group">
+            <input 
+              type="text" 
+              placeholder="Nom complet" 
+              [(ngModel)]="registerData.name"
+              name="registerName"
+              required>
+          </div>
+          <div class="form-group">
+            <input 
+              type="email" 
+              placeholder="Email" 
+              [(ngModel)]="registerData.email"
+              name="registerEmail"
+              required>
+          </div>
+          <div class="form-group">
+            <input 
+              type="password" 
+              placeholder="Mot de passe" 
+              [(ngModel)]="registerData.password"
+              name="registerPassword"
+              required>
+          </div>
+          <div class="form-group">
+            <input 
+              type="password" 
+              placeholder="Confirmer le mot de passe" 
+              [(ngModel)]="registerData.confirmPassword"
+              name="registerConfirmPassword"
+              required>
+          </div>
+          <button type="submit" class="auth-btn register-btn">S'inscrire</button>
+
+          <!-- MESSAGES D'ERREUR ET CHARGEMENT -->
+          <div *ngIf="errorMessage" class="error-message" style="color: red; text-align: center; margin-top: 1rem; padding: 10px; background: #ffe6e6; border-radius: 5px;">
+            {{ errorMessage }}
+          </div>
+          <div *ngIf="isLoading" class="loading" style="text-align: center; margin-top: 1rem;">
+            <div style="display: inline-block; padding: 10px 20px; background: #f0f0f0; border-radius: 5px;">
+              Chargement...
+            </div>
+          </div>
+        </form>
+        <div class="auth-switch">
+          <p>Déjà un compte? <a href="javascript:void(0)" (click)="showLogin()">Se connecter</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Popup vidéo YouTube -->
+  <div class="video-modal-overlay" *ngIf="showVideoModal" (click)="closeVideoModal()">
+    <div class="video-modal-content" (click)="$event.stopPropagation()">
+      <button class="close-video-modal" (click)="closeVideoModal()">&times;</button>
+      <div class="video-container">
+        <iframe 
+          [src]="videoUrl"
+          width="100%" 
+          height="100%" 
+          frameborder="0" 
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+          allowfullscreen>
+        </iframe>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="features" class="features-section">
+  <div class="container">
+    <h2 class="section-title">Fonctionnalités principales</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">📦</div>
+        <h3 class="feature-title">Gestion de stock</h3>
+        <p class="feature-description">
+          Suivez votre inventaire en temps réel avec des alertes de stock faible 
+          et des analyses prédictives.
+        </p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🚚</div>
+        <h3 class="feature-title">Suivi de colis</h3>
+        <p class="feature-description">
+          Intégration avec les principaux transporteurs pour un suivi unifié 
+          de tous vos envois.
+        </p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3 class="feature-title">Rapports détaillés</h3>
+        <p class="feature-description">
+          Génerez des rapports personnalisés pour analyser vos performances 
+          et optimiser vos processus.
+        </p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📱</div>
+        <h3 class="feature-title">Application mobile</h3>
+        <p class="feature-description">
+          Gérez votre stock et suivez vos colis depuis votre smartphone où 
+          que vous soyez.
+        </p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔗</div>
+        <h3 class="feature-title">Intégrations</h3>
+        <p class="feature-description">
+          Connectez Stocki avec vos outils existants (ERP, e-commerce, etc.) 
+          pour un workflow unifié.
+        </p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🛡️</div>
+        <h3 class="feature-title">Sécurité</h3>
+        <p class="feature-description">
+          Vos données sont protégées avec un chiffrement de niveau bancaire 
+          et des sauvegardes automatiques.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-section">
+  <div class="container">
+    <div class="cta-content">
+      <h2 class="cta-title">Prêt à transformer votre gestion logistique ?</h2>
+      <p class="cta-description">
+        Rejoignez des centaines d'entreprises qui font confiance à Stocki
+      </p>
+      <button class="cta-primary large" (click)="startFreeTrial()">
+        Essai gratuit 14 jours
+      </button>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-content">
+      <div class="footer-section">
+        <div class="logo">
+          <span class="logo-text">Stocki</span>
+        </div>
+        <p class="footer-description">
+          La solution tout-en-un pour la gestion de stock et le suivi de colis.
+        </p>
+      </div>
+      <div class="footer-section">
+        <h4>Produit</h4>
+        <a href="#features" class="footer-link">Fonctionnalités</a>
+        <a href="#" class="footer-link">Tarifs</a>
+        <a href="#" class="footer-link">API</a>
+      </div>
+      <div class="footer-section">
+        <h4>Entreprise</h4>
+        <a href="#" class="footer-link">À propos</a>
+        <a href="#" class="footer-link">Blog</a>
+        <a href="#" class="footer-link">Carrières</a>
+      </div>
+      <div class="footer-section">
+        <h4>Support</h4>
+        <a href="#" class="footer-link">Centre d'aide</a>
+        <a href="#contact" class="footer-link">Contact</a>
+        <a href="#" class="footer-link">Status</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2025 Stocki. Tous droits réservés.</p>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,75 @@
+<div class="app-container">
+  <!-- NAVBAR -->
+  <header class="navbar">
+    <div class="nav-left">
+      <div class="logo">
+        <img src="assets/logo.png" alt="Stocki" class="logo-img">
+        <span class="logo-text">Stocki</span>
+      </div>
+
+      <input type="text" placeholder="Recherche..." class="search" />
+      <select class="filter">
+        <option>Tous</option>
+        <option>Vente</option>
+        <option>Interne</option>
+      </select>
+    </div>
+
+    <div class="user-info">
+      <img src="assets/user.jpg" alt="user" />
+      <span>Bonjour Adélaïde Bourgois</span>
+    </div>
+  </header>
+
+  <!-- CONTAINER -->
+  <div class="container">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <ul class="menu">
+        <li>📊 Tableau de bord</li>
+        
+        <li class="active">
+          <a routerLink="/magasin" class="nav-link">🏪 Magasins</a>
+        </li>
+        <ul class="submenu">
+        </ul>
+        
+        <li>
+          <a routerLink="/categorie" class="nav-link">📂 Catégories</a> <!-- ← CORRIGÉ -->
+        </li>
+        <ul class="submenu">
+        </ul>
+        
+        <li>
+          <a routerLink="/produit" class="nav-link">📦 Produits</a>
+        </li>
+        <ul class="submenu">
+        </ul>
+      </ul>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+      <section class="product-list">
+        <div class="product-item" *ngFor="let p of produits">
+          <div class="col image">
+            <img [src]="p.image" alt="produit" />
+          </div>
+          <div class="col name">{{ p.nom }}</div>
+          <div class="col code">{{ p.code }}</div>
+          <div class="col type">
+            <button [ngClass]="p.type" class="btn-type">{{ p.type }}</button>
+          </div>
+          <div class="col price">{{ p.adresse }}</div>
+          <div class="col actions">
+            <button class="minus">−</button>
+            <button class="plus">＋</button>
+            <button class="view">👁️</button>
+            <button class="edit">✏️</button>
+            <button class="delete">🗑️</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
