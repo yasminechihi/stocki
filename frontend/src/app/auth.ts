@@ -88,7 +88,21 @@ export class AuthService {
 
   addMagasin(magasinData: any): Observable<any> {
     const headers = this.getAuthHeaders();
-    return this.http.post(`${this.apiUrl}/magasins`, magasinData, { headers });
+    // Supprimer le champ image des données envoyées
+    const { image, ...dataWithoutImage } = magasinData;
+    return this.http.post(`${this.apiUrl}/magasins`, dataWithoutImage, { headers });
+  }
+
+  updateMagasin(id: number, magasinData: any): Observable<any> {
+    const headers = this.getAuthHeaders();
+    // Supprimer le champ image des données envoyées
+    const { image, ...dataWithoutImage } = magasinData;
+    return this.http.put(`${this.apiUrl}/magasins/${id}`, dataWithoutImage, { headers });
+  }
+
+  deleteMagasin(id: number): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.delete(`${this.apiUrl}/magasins/${id}`, { headers });
   }
 
   addCategorie(categorieData: any): Observable<any> {
@@ -96,15 +110,40 @@ export class AuthService {
     return this.http.post(`${this.apiUrl}/categories`, categorieData, { headers });
   }
 
+  updateCategorie(id: number, categorieData: any): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.put(`${this.apiUrl}/categories/${id}`, categorieData, { headers });
+  }
+
+  deleteCategorie(id: number): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.delete(`${this.apiUrl}/categories/${id}`, { headers });
+  }
+
   addProduit(produitData: any): Observable<any> {
     const headers = this.getAuthHeaders();
-    return this.http.post(`${this.apiUrl}/produits`, produitData, { headers });
+    // Supprimer le champ image des données envoyées
+    const { image, ...dataWithoutImage } = produitData;
+    return this.http.post(`${this.apiUrl}/produits`, dataWithoutImage, { headers });
+  }
+
+  updateProduit(id: number, produitData: any): Observable<any> {
+    const headers = this.getAuthHeaders();
+    // Supprimer le champ image des données envoyées
+    const { image, ...dataWithoutImage } = produitData;
+    return this.http.put(`${this.apiUrl}/produits/${id}`, dataWithoutImage, { headers });
+  }
+
+  deleteProduit(id: number): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.delete(`${this.apiUrl}/produits/${id}`, { headers });
   }
 
   private getAuthHeaders(): HttpHeaders {
     const token = this.getToken();
     return new HttpHeaders({
-      'Authorization': `Bearer ${token}`
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
     });
   }
 

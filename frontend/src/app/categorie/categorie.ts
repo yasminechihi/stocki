@@ -30,9 +30,13 @@ export class Categorie implements OnInit {
 
   loadUserData(): void {
     this.currentUser = this.authService.getCurrentUser();
+    if (!this.currentUser) {
+      console.error('Aucun utilisateur connecté');
+      // Rediriger vers la page de connexion si nécessaire
+    }
   }
 
-  async loadCategories() {
+  loadCategories() {
     this.isLoading = true;
     try {
       this.authService.getCategories().subscribe({
@@ -56,7 +60,7 @@ export class Categorie implements OnInit {
 
   private async loadCategoriesLegacy() {
     try {
-      console.log('🔄 Début du chargement des catégories...');
+      console.log('🔄 Début du chargement des catégories (legacy)...');
       
       const response = await fetch("http://localhost:3001/categories");
       
@@ -91,51 +95,45 @@ export class Categorie implements OnInit {
     if (!this.selectedCategory) return;
 
     try {
-      let response: Response;
-      
       if (this.selectedCategory.id === 0) {
-        // MODE AJOUT - Requête POST
-        response = await fetch("http://localhost:3001/categories", {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
+        // MODE AJOUT
+        this.authService.addCategorie({
+          nom: this.selectedCategory.nom,
+          code: this.selectedCategory.code,
+          description: this.selectedCategory.description
+        }).subscribe({
+          next: (newCategory) => {
+            console.log('✅ Catégorie ajoutée:', newCategory);
+            this.categories.push(newCategory);
+            this.closePopups();
+            this.loadCategories(); // Recharger pour s'assurer d'avoir les données fraîches
           },
-          body: JSON.stringify({
-            nom: this.selectedCategory.nom,
-            code: this.selectedCategory.code,
-            description: this.selectedCategory.description
-          })
-        });
-      } else {
-        // MODE ÉDITION - Requête PUT
-        response = await fetch(`http://localhost:3001/categories/${this.selectedCategory.id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(this.selectedCategory)
-        });
-      }
-
-      if (response.ok) {
-        const updatedCategory = await response.json();
-        
-        if (this.selectedCategory.id === 0) {
-          // Ajouter la nouvelle catégorie à la liste
-          this.categories.push(updatedCategory);
-        } else {
-          // Mettre à jour localement la catégorie existante
-          const index = this.categories.findIndex(c => c.id === this.selectedCategory.id);
-          if (index !== -1) {
-            this.categories[index] = { ...updatedCategory };
+          error: (error) => {
+            console.error('❌ Erreur ajout catégorie:', error);
+            alert('Erreur lors de l\'ajout de la catégorie: ' + (error.error?.message || 'Erreur serveur'));
           }
-        }
-        
-        this.closePopups();
-        console.log('✅ Catégorie sauvegardée avec succès');
+        });
       } else {
-        const errorData = await response.json();
-        alert('Erreur: ' + (errorData.error || 'Erreur lors de la sauvegarde'));
+        // MODE ÉDITION
+        this.authService.updateCategorie(this.selectedCategory.id, {
+          nom: this.selectedCategory.nom,
+          code: this.selectedCategory.code,
+          description: this.selectedCategory.description
+        }).subscribe({
+          next: (updatedCategory) => {
+            console.log('✅ Catégorie modifiée:', updatedCategory);
+            // Mettre à jour localement la catégorie existante
+            const index = this.categories.findIndex(c => c.id === this.selectedCategory.id);
+            if (index !== -1) {
+              this.categories[index] = { ...updatedCategory };
+            }
+            this.closePopups();
+          },
+          error: (error) => {
+            console.error('❌ Erreur modification catégorie:', error);
+            alert('Erreur lors de la modification de la catégorie: ' + (error.error?.message || 'Erreur serveur'));
+          }
+        });
       }
     } catch (error) {
       console.error('Erreur:', error);
@@ -147,19 +145,18 @@ export class Categorie implements OnInit {
     if (!this.selectedCategory) return;
 
     try {
-      const response = await fetch(`http://localhost:3001/categories/${this.selectedCategory.id}`, {
-        method: 'DELETE'
+      this.authService.deleteCategorie(this.selectedCategory.id).subscribe({
+        next: () => {
+          console.log('✅ Catégorie supprimée avec succès');
+          // Supprimer de la liste locale
+          this.categories = this.categories.filter(c => c.id !== this.selectedCategory.id);
+          this.closePopups();
+        },
+        error: (error) => {
+          console.error('❌ Erreur suppression catégorie:', error);
+          alert('Erreur lors de la suppression de la catégorie: ' + (error.error?.message || 'Erreur serveur'));
+        }
       });
-
-      if (response.ok) {
-        // Supprimer de la liste locale
-        this.categories = this.categories.filter(c => c.id !== this.selectedCategory.id);
-        this.closePopups();
-        console.log('✅ Catégorie supprimée avec succès');
-      } else {
-        const errorData = await response.json();
-        alert('Erreur: ' + (errorData.error || 'Erreur lors de la suppression'));
-      }
     } catch (error) {
       console.error('Erreur:', error);
       alert('Erreur de connexion au serveur');

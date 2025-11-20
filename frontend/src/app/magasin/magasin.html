@@ -1,84 +1,155 @@
 <div class="app-container">
+  
   <!-- NAVBAR -->
   <header class="navbar">
     <div class="nav-left">
       <div class="logo">
-        <img src="assets/logo.png" alt="Stocki" class="logo-img">
+        <img src="assets/logo.png" class="logo-img" />
         <span class="logo-text">Stocki</span>
       </div>
-
-      <input type="text" placeholder="Recherche..." class="search" />
-      <select class="filter">
-        <option>Tous</option>
-        <option>Vente</option>
-        <option>Interne</option>
-      </select>
     </div>
 
     <div class="user-info">
-      <img src="assets/user.jpg" alt="user" />
+      <img src="assets/user.jpg" />
       <span *ngIf="currentUser">Bonjour {{ currentUser.name }}</span>
-      <span *ngIf="!currentUser">Chargement...</span>
       <button class="logout-btn" (click)="logout()">Déconnexion</button>
     </div>
   </header>
 
-  <!-- CONTAINER -->
+  <!-- WRAPPER GLOBAL -->
   <div class="container">
+
     <!-- SIDEBAR -->
     <aside class="sidebar">
       <ul class="menu">
         <li>📊 Tableau de bord</li>
-        
         <li class="active">
           <a routerLink="/magasin" class="nav-link">🏪 Magasins</a>
         </li>
-        
-        <li>
-          <a routerLink="/categorie" class="nav-link">📂 Catégories</a>
-        </li>
-        
-        <li>
-          <a routerLink="/produit" class="nav-link">📦 Produits</a>
-        </li>
+        <li><a routerLink="/categorie" class="nav-link">📂 Catégories</a></li>
+        <li><a routerLink="/produit" class="nav-link">📦 Produits</a></li>
       </ul>
     </aside>
 
-    <!-- MAIN CONTENT -->
-    <main class="main-content">
+    <!-- CONTENT RIGHT -->
+    <main class="content">
+
+      <!-- SECTION BIENVENUE -->
       <div class="welcome-section" *ngIf="currentUser">
-        <h2>Bienvenue, {{ currentUser.name }}!</h2>
-        <p>Voici vos produits</p>
+        <h2>Vos Magasins, {{ currentUser.name }}</h2>
       </div>
 
+      <!-- LOADING -->
       <div class="loading" *ngIf="isLoading">
-        Chargement de vos produits...
+        <p>Chargement des magasins...</p>
       </div>
 
-      <section class="product-list" *ngIf="!isLoading">
-        <div class="product-item" *ngFor="let p of produits">
-          <div class="col image">
-            <img [src]="p.image || 'assets/default-product.png'" alt="produit" />
-          </div>
-          <div class="col name">{{ p.nom }}</div>
-          <div class="col code">{{ p.code }}</div>
-          <div class="col type">
-            <button [ngClass]="p.type" class="btn-type">{{ p.type }}</button>
-          </div>
-          <div class="col price">{{ p.adresse || p.prix }}</div>
+      <!-- LISTE DES MAGASINS -->
+      <div class="magasin-list" *ngIf="!isLoading">
+
+        <div class="item-row header-row">
+          <div class="col name">Nom</div>
+          <div class="col code">Code</div>
+          <div class="col type">Type</div>
+          <div class="col adresse">Adresse</div>
           <div class="col actions">
-            <button class="minus">−</button>
-            <button class="plus">＋</button>
-            <button class="view">👁️</button>
-            <button class="edit">✏️</button>
-            <button class="delete">🗑️</button>
+            Actions
+            <span class="icon-btn add-btn" (click)="addMagasin()" title="Ajouter un magasin">➕</span>
           </div>
         </div>
 
-        <div class="no-data" *ngIf="produits.length === 0">
-          Aucun produit trouvé. Ajoutez votre premier produit!
+        <div class="item-row" *ngFor="let m of magasins">
+          <div class="col name">{{ m.nom }}</div>
+          <div class="col code">{{ m.code }}</div>
+          <div class="col type">{{ m.type }}</div>
+          <div class="col adresse">{{ m.adresse }}</div>
+
+          <div class="col actions">
+            <span class="icon-btn edit-btn" (click)="editMagasin(m)" title="Modifier">✏️</span>
+            <span class="icon-btn delete-btn" (click)="deleteMagasin(m)" title="Supprimer">🗑️</span>
+          </div>
         </div>
-      </section>
+
+        <!-- Message si aucun magasin -->
+        <div class="no-data" *ngIf="magasins.length === 0 && !isLoading">
+          Aucun magasin trouvé. Créez votre premier magasin!
+        </div>
+
+      </div>
+
     </main>
+
   </div>
+
+  <!-- POPUP DE MODIFICATION -->
+  <div class="popup-overlay" *ngIf="showEditPopup">
+    <div class="popup">
+      <h3>{{ selectedMagasin?.id === 0 ? 'Ajouter' : 'Modifier' }} le magasin</h3>
+      <div class="popup-content">
+        <div class="form-group">
+          <label>Nom:</label>
+          <input 
+            type="text" 
+            [value]="selectedMagasin?.nom" 
+            #nameInput
+            (input)="updateMagasinField('nom', nameInput.value)"
+            class="form-input"
+            placeholder="Entrez le nom"
+          >
+        </div>
+        <div class="form-group">
+          <label>Code:</label>
+          <input 
+            type="text" 
+            [value]="selectedMagasin?.code" 
+            #codeInput
+            (input)="updateMagasinField('code', codeInput.value)"
+            class="form-input"
+            placeholder="Entrez le code"
+          >
+        </div>
+        <div class="form-group">
+          <label>Type:</label>
+          <select 
+            #typeSelect
+            (change)="updateMagasinField('type', typeSelect.value)"
+            class="form-select"
+          >
+            <option value="Interne" [selected]="selectedMagasin?.type === 'Interne'">Interne</option>
+            <option value="Vente" [selected]="selectedMagasin?.type === 'Vente'">Vente</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Adresse:</label>
+          <textarea 
+            #adresseTextarea
+            (input)="updateMagasinField('adresse', adresseTextarea.value)"
+            class="form-textarea"
+            placeholder="Entrez l'adresse"
+          >{{ selectedMagasin?.adresse }}</textarea>
+        </div>
+        <!-- SUPPRIMÉ: Champ image URL -->
+      </div>
+      <div class="popup-actions">
+        <button class="btn btn-cancel" (click)="closePopups()">Annuler</button>
+        <button class="btn btn-confirm" (click)="confirmEdit()">Confirmer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- POPUP DE SUPPRESSION -->
+  <div class="popup-overlay" *ngIf="showDeletePopup">
+    <div class="popup">
+      <h3>Confirmer la suppression</h3>
+      <div class="popup-content">
+        <p>Êtes-vous sûr de vouloir supprimer le magasin <strong>"{{ selectedMagasin?.nom }}"</strong> ?</p>
+        <p class="warning-text">Cette action est irréversible !</p>
+      </div>
+      <div class="popup-actions">
+        <button class="btn btn-cancel" (click)="closePopups()">Annuler</button>
+        <button class="btn btn-danger" (click)="confirmDelete()">Supprimer</button>
+      </div>
+    </div>
+  </div>
+
 </div>
