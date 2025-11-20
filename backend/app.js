@@ -414,21 +414,85 @@ app.get("/api/produits", authenticateToken, (req, res) => {
 // Route pour ajouter un magasin
 app.post("/api/magasins", authenticateToken, (req, res) => {
   const userId = req.user.userId;
-  const { nom, code, type, adresse, image } = req.body;
+  const { nom, code, type, adresse } = req.body;
   
   conn.query(
-    "INSERT INTO magasins (user_id, nom, code, type, adresse, image) VALUES (?, ?, ?, ?, ?, ?)",
-    [userId, nom, code, type, adresse, image],
+    "INSERT INTO magasins (user_id, nom, code, type, adresse) VALUES (?, ?, ?, ?, ?)",
+    [userId, nom, code, type, adresse],
     (err, results) => {
       if (err) {
         console.error("❌ Erreur création magasin:", err);
         return res.status(500).json({ message: "Erreur serveur" });
       }
       
-      res.status(201).json({ 
-        message: "Magasin créé avec succès",
-        magasinId: results.insertId
+      // Récupérer le magasin créé
+      conn.query("SELECT * FROM magasins WHERE id = ?", [results.insertId], (err, newMagasin) => {
+        if (err) {
+          return res.status(201).json({ 
+            message: "Magasin créé avec succès",
+            magasinId: results.insertId
+          });
+        }
+        
+        res.status(201).json(newMagasin[0]);
       });
+    }
+  );
+});
+
+// Route pour modifier un magasin
+app.put("/api/magasins/:id", authenticateToken, (req, res) => {
+  const userId = req.user.userId;
+  const magasinId = req.params.id;
+  const { nom, code, type, adresse } = req.body;
+  
+  conn.query(
+    "UPDATE magasins SET nom = ?, code = ?, type = ?, adresse = ? WHERE id = ? AND user_id = ?",
+    [nom, code, type, adresse, magasinId, userId],
+    (err, results) => {
+      if (err) {
+        console.error("❌ Erreur modification magasin:", err);
+        return res.status(500).json({ message: "Erreur serveur" });
+      }
+      
+      if (results.affectedRows === 0) {
+        return res.status(404).json({ message: "Magasin non trouvé" });
+      }
+      
+      // Récupérer le magasin mis à jour
+      conn.query("SELECT * FROM magasins WHERE id = ?", [magasinId], (err, updatedMagasin) => {
+        if (err) {
+          return res.json({ 
+            message: "Magasin modifié avec succès",
+            id: magasinId
+          });
+        }
+        
+        res.json(updatedMagasin[0]);
+      });
+    }
+  );
+});
+
+// Route pour supprimer un magasin
+app.delete("/api/magasins/:id", authenticateToken, (req, res) => {
+  const userId = req.user.userId;
+  const magasinId = req.params.id;
+  
+  conn.query(
+    "DELETE FROM magasins WHERE id = ? AND user_id = ?",
+    [magasinId, userId],
+    (err, results) => {
+      if (err) {
+        console.error("❌ Erreur suppression magasin:", err);
+        return res.status(500).json({ message: "Erreur serveur" });
+      }
+      
+      if (results.affectedRows === 0) {
+        return res.status(404).json({ message: "Magasin non trouvé" });
+      }
+      
+      res.json({ message: "Magasin supprimé avec succès" });
     }
   );
 });
@@ -447,10 +511,74 @@ app.post("/api/categories", authenticateToken, (req, res) => {
         return res.status(500).json({ message: "Erreur serveur" });
       }
       
-      res.status(201).json({ 
-        message: "Catégorie créée avec succès",
-        categorieId: results.insertId
+      // Récupérer la catégorie créée
+      conn.query("SELECT * FROM categories WHERE id = ?", [results.insertId], (err, newCategory) => {
+        if (err) {
+          return res.status(201).json({ 
+            message: "Catégorie créée avec succès",
+            categorieId: results.insertId
+          });
+        }
+        
+        res.status(201).json(newCategory[0]);
       });
+    }
+  );
+});
+
+// Route pour modifier une catégorie
+app.put("/api/categories/:id", authenticateToken, (req, res) => {
+  const userId = req.user.userId;
+  const categoryId = req.params.id;
+  const { nom, code, description } = req.body;
+  
+  conn.query(
+    "UPDATE categories SET nom = ?, code = ?, description = ? WHERE id = ? AND user_id = ?",
+    [nom, code, description, categoryId, userId],
+    (err, results) => {
+      if (err) {
+        console.error("❌ Erreur modification catégorie:", err);
+        return res.status(500).json({ message: "Erreur serveur" });
+      }
+      
+      if (results.affectedRows === 0) {
+        return res.status(404).json({ message: "Catégorie non trouvée" });
+      }
+      
+      // Récupérer la catégorie mise à jour
+      conn.query("SELECT * FROM categories WHERE id = ?", [categoryId], (err, updatedCategory) => {
+        if (err) {
+          return res.json({ 
+            message: "Catégorie modifiée avec succès",
+            id: categoryId
+          });
+        }
+        
+        res.json(updatedCategory[0]);
+      });
+    }
+  );
+});
+
+// Route pour supprimer une catégorie
+app.delete("/api/categories/:id", authenticateToken, (req, res) => {
+  const userId = req.user.userId;
+  const categoryId = req.params.id;
+  
+  conn.query(
+    "DELETE FROM categories WHERE id = ? AND user_id = ?",
+    [categoryId, userId],
+    (err, results) => {
+      if (err) {
+        console.error("❌ Erreur suppression catégorie:", err);
+        return res.status(500).json({ message: "Erreur serveur" });
+      }
+      
+      if (results.affectedRows === 0) {
+        return res.status(404).json({ message: "Catégorie non trouvée" });
+      }
+      
+      res.json({ message: "Catégorie supprimée avec succès" });
     }
   );
 });
@@ -458,21 +586,85 @@ app.post("/api/categories", authenticateToken, (req, res) => {
 // Route pour ajouter un produit
 app.post("/api/produits", authenticateToken, (req, res) => {
   const userId = req.user.userId;
-  const { nom, code, type, prix, adresse, image } = req.body;
+  const { nom, code, type, prix, adresse } = req.body;
   
   conn.query(
-    "INSERT INTO produits (user_id, nom, code, type, prix, adresse, image) VALUES (?, ?, ?, ?, ?, ?, ?)",
-    [userId, nom, code, type, prix, adresse, image],
+    "INSERT INTO produits (user_id, nom, code, type, prix, adresse) VALUES (?, ?, ?, ?, ?, ?)",
+    [userId, nom, code, type, prix, adresse],
     (err, results) => {
       if (err) {
         console.error("❌ Erreur création produit:", err);
         return res.status(500).json({ message: "Erreur serveur" });
       }
       
-      res.status(201).json({ 
-        message: "Produit créé avec succès",
-        produitId: results.insertId
+      // Récupérer le produit créé
+      conn.query("SELECT * FROM produits WHERE id = ?", [results.insertId], (err, newProduit) => {
+        if (err) {
+          return res.status(201).json({ 
+            message: "Produit créé avec succès",
+            produitId: results.insertId
+          });
+        }
+        
+        res.status(201).json(newProduit[0]);
       });
+    }
+  );
+});
+
+// Route pour modifier un produit
+app.put("/api/produits/:id", authenticateToken, (req, res) => {
+  const userId = req.user.userId;
+  const produitId = req.params.id;
+  const { nom, code, type, prix, adresse } = req.body;
+  
+  conn.query(
+    "UPDATE produits SET nom = ?, code = ?, type = ?, prix = ?, adresse = ? WHERE id = ? AND user_id = ?",
+    [nom, code, type, prix, adresse, produitId, userId],
+    (err, results) => {
+      if (err) {
+        console.error("❌ Erreur modification produit:", err);
+        return res.status(500).json({ message: "Erreur serveur" });
+      }
+      
+      if (results.affectedRows === 0) {
+        return res.status(404).json({ message: "Produit non trouvé" });
+      }
+      
+      // Récupérer le produit mis à jour
+      conn.query("SELECT * FROM produits WHERE id = ?", [produitId], (err, updatedProduit) => {
+        if (err) {
+          return res.json({ 
+            message: "Produit modifié avec succès",
+            id: produitId
+          });
+        }
+        
+        res.json(updatedProduit[0]);
+      });
+    }
+  );
+});
+
+// Route pour supprimer un produit
+app.delete("/api/produits/:id", authenticateToken, (req, res) => {
+  const userId = req.user.userId;
+  const produitId = req.params.id;
+  
+  conn.query(
+    "DELETE FROM produits WHERE id = ? AND user_id = ?",
+    [produitId, userId],
+    (err, results) => {
+      if (err) {
+        console.error("❌ Erreur suppression produit:", err);
+        return res.status(500).json({ message: "Erreur serveur" });
+      }
+      
+      if (results.affectedRows === 0) {
+        return res.status(404).json({ message: "Produit non trouvé" });
+      }
+      
+      res.json({ message: "Produit supprimé avec succès" });
     }
   );
 });
