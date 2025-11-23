@@ -1,0 +1,233 @@
+<div class="app-container">
+  <header class="navbar">
+    <div class="nav-left">
+      <div class="logo">
+        <img src="assets/logo.png" class="logo-img" />
+        <span class="logo-text">Stocki</span>
+      </div>
+    </div>
+    <div class="user-info">
+      <img src="assets/user.jpg" />
+      <span *ngIf="currentUser">Bonjour {{ currentUser.name }}</span>
+      <button class="logout-btn" (click)="logout()">Déconnexion</button>
+    </div>
+  </header>
+  <div class="container">
+    <aside class="sidebar">
+      <ul class="menu">
+        <li>
+          <a routerLink="/dashboard" class="nav-link">📊 Tableau de bord</a>
+        </li>
+        <li><a routerLink="/magasin" class="nav-link">🏪 Magasins</a></li>
+        <li>
+          <a routerLink="/categorie" class="nav-link">📂 Catégories</a>
+        </li>
+        <li><a routerLink="/produit" class="nav-link">📦 Produits</a></li>
+        <li>
+          <a routerLink="/ventes" class="nav-link">💰 Ventes</a>
+        </li>
+        <li><a routerLink="/stock" class="nav-link">📈 Stock</a></li>
+        <li class="active"><a routerLink="/mouvements" class="nav-link">🔄 Mouvements</a></li>
+      </ul>
+    </aside>
+    <main class="content">
+      <div class="welcome-section" *ngIf="currentUser">
+        <h2>Vos Mouvements de Stock, {{ currentUser.name }}</h2>
+      </div>
+
+      <!-- Barre de statistiques -->
+      <div class="stats-bar" *ngIf="!isLoading && mouvements.length > 0">
+        <div class="stat-card">
+          <div class="stat-number">{{ getTotalMouvements() }}</div>
+          <div class="stat-label">Total Mouvements</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">{{ getTotalEntrees() }}</div>
+          <div class="stat-label">Entrées</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">{{ getTotalSorties() }}</div>
+          <div class="stat-label">Sorties</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">{{ getValeurTotale() }} DT</div>
+          <div class="stat-label">Valeur Totale</div>
+        </div>
+      </div>
+
+      <div class="loading" *ngIf="isLoading">
+        <p>Chargement des mouvements...</p>
+      </div>
+      <div class="mouvement-list" *ngIf="!isLoading">
+        <div class="item-row header-row">
+          <div class="col id">ID</div>
+          <div class="col produit">Produit</div>
+          <div class="col magasin">Magasin</div>
+          <div class="col categorie">Catégorie</div>
+          <div class="col type">Type</div>
+          <div class="col quantite">Quantité</div>
+          <div class="col prix">Prix Unitaire</div>
+          <div class="col date">Date</div>
+          <div class="col motif">Motif</div>
+          <div class="col actions">
+            Actions
+            <span class="icon-btn add-btn" (click)="addMouvement()" title="Ajouter un mouvement">➕</span>
+          </div>
+        </div>
+        <div class="item-row" *ngFor="let m of mouvements">
+          <div class="col id">{{ m.id }}</div>
+          <div class="col produit">{{ m.produit_nom || m.produit?.nom }}</div>
+          <div class="col magasin">{{ m.magasin_nom || m.magasin?.nom }}</div>
+          <div class="col categorie">{{ m.categorie_nom || m.categorie?.nom }}</div>
+          <div class="col type" [class]="m.type_mouvement">{{ m.type_mouvement }}</div>
+          <div class="col quantite">{{ m.quantite }}</div>
+          <div class="col prix">{{ m.prix_unitaire | number:'1.2-2' }}</div>
+          <div class="col date">{{ m.date_mouvement | date:'dd/MM/yyyy' }}</div>
+          <div class="col motif">{{ m.motif }}</div>
+          <div class="col actions">
+            <span class="icon-btn edit-btn" (click)="editMouvement(m)" title="Modifier">✏️</span>
+            <span class="icon-btn delete-btn" (click)="deleteMouvement(m)" title="Supprimer">🗑️</span>
+          </div>
+        </div>
+        <div class="no-data" *ngIf="mouvements.length === 0 && !isLoading">
+          📊 Aucun mouvement trouvé. Créez votre premier mouvement de stock!
+        </div>
+      </div>
+    </main>
+  </div>
+  
+  <!-- Popup d'édition/ajout -->
+  <div class="popup-overlay" *ngIf="showEditPopup">
+    <div class="popup">
+      <h3>{{ selectedMouvement?.id === 0 ? 'Ajouter' : 'Modifier' }} le mouvement</h3>
+      <div class="popup-content">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Magasin:</label>
+            <select 
+              #magasinSelect
+              (change)="updateMouvementField('magasin_id', magasinSelect.value)"
+              class="form-select"
+            >
+              <option value="">Sélectionnez un magasin</option>
+              <option *ngFor="let m of magasins" [value]="m.id" [selected]="m.id === selectedMouvement?.magasin_id">
+                {{ m.nom }} ({{ m.code }})
+              </option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Catégorie:</label>
+            <select 
+              #categorieSelect
+              (change)="updateMouvementField('categorie_id', categorieSelect.value)"
+              class="form-select"
+            >
+              <option value="">Sélectionnez une catégorie</option>
+              <option *ngFor="let c of categories" [value]="c.id" [selected]="c.id === selectedMouvement?.categorie_id">
+                {{ c.nom }} ({{ c.code }})
+              </option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label>Type de mouvement:</label>
+            <select 
+              #typeSelect
+              (change)="updateMouvementField('type_mouvement', typeSelect.value)"
+              class="form-select"
+            >
+              <option value="entree" [selected]="selectedMouvement?.type_mouvement === 'entree'">Entrée</option>
+              <option value="sortie" [selected]="selectedMouvement?.type_mouvement === 'sortie'">Sortie</option>
+              <option value="ajustement" [selected]="selectedMouvement?.type_mouvement === 'ajustement'">Ajustement</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Produit:</label>
+            <select 
+              #produitSelect
+              (change)="updateMouvementField('produit_id', produitSelect.value)"
+              class="form-select"
+            >
+              <option value="">Sélectionnez un produit</option>
+              <option *ngFor="let p of produits" [value]="p.id" [selected]="p.id === selectedMouvement?.produit_id">
+                {{ p.nom }} ({{ p.code }})
+              </option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label>Quantité:</label>
+            <input 
+              type="number" 
+              [value]="selectedMouvement?.quantite" 
+              #quantiteInput
+              (input)="updateMouvementField('quantite', quantiteInput.value)"
+              class="form-input"
+              placeholder="Entrez la quantité"
+              min="1"
+            >
+          </div>
+          <div class="form-group">
+            <label>Prix unitaire (DT):</label>
+            <input 
+              type="number" 
+              [value]="selectedMouvement?.prix_unitaire" 
+              #prixInput
+              (input)="updateMouvementField('prix_unitaire', prixInput.value)"
+              class="form-input"
+              placeholder="Entrez le prix unitaire"
+              step="0.01"
+              min="0"
+            >
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label>Date:</label>
+            <input 
+              type="date" 
+              [value]="selectedMouvement?.date_mouvement" 
+              #dateInput
+              (input)="updateMouvementField('date_mouvement', dateInput.value)"
+              class="form-input"
+            >
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label>Motif:</label>
+          <textarea 
+            #motifTextarea
+            (input)="updateMouvementField('motif', motifTextarea.value)"
+            class="form-textarea"
+            placeholder="Entrez le motif du mouvement"
+          >{{ selectedMouvement?.motif }}</textarea>
+        </div>
+      </div>
+      <div class="popup-actions">
+        <button class="btn btn-cancel" (click)="closePopups()">Annuler</button>
+        <button class="btn btn-confirm" (click)="confirmEdit()">Confirmer</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Popup de suppression -->
+  <div class="popup-overlay" *ngIf="showDeletePopup">
+    <div class="popup">
+      <h3>Confirmer la suppression</h3>
+      <div class="popup-content">
+        <p>Êtes-vous sûr de vouloir supprimer le mouvement <strong>#{{ selectedMouvement?.id }}</strong> ?</p>
+        <p class="warning-text">Cette action est irréversible !</p>
+      </div>
+      <div class="popup-actions">
+        <button class="btn btn-cancel" (click)="closePopups()">Annuler</button>
+        <button class="btn btn-danger" (click)="confirmDelete()">Supprimer</button>
+      </div>
+    </div>
+  </div>
+</div>

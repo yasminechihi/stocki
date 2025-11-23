@@ -7,13 +7,12 @@ import { CommonModule } from '@angular/common';
   selector: 'app-root',
   standalone: true,
   imports: [
-    CommonModule,      // utile pour *ngIf, *ngFor etc.
-    RouterOutlet,      // pour charger les routes
-    HttpClientModule   // pour HttpClient (services API)
+    CommonModule,      
+    RouterOutlet,      
+    HttpClientModule  
   ],
   templateUrl: './app.html',
   styleUrls: ['./app.css']
 })
 export class App {
-  // Tu peux mettre des propriétés ou méthodes si besoin
 }

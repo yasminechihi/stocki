@@ -17,6 +17,7 @@ export interface AuthResponse {
   requires2FA?: boolean;
   userId?: string;
   debugCode?: string;
+  success?: boolean;
 }
 
 export interface ContactResponse {
@@ -65,37 +66,30 @@ export class AuthService {
     return this.http.post<AuthResponse>(`${this.apiUrl}/resend-2fa`, { userId });
   }
 
-  // MÉTHODE POUR LE CONTACT
   contact(contactData: any): Observable<ContactResponse> {
     return this.http.post<ContactResponse>(`${this.apiUrl}/contact`, contactData);
   }
 
-  // NOUVELLES MÉTHODES POUR LES DONNÉES UTILISATEUR
+  // === DASHBOARD ===
+  getDashboardStats(): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.get(`${this.apiUrl}/dashboard/stats`, { headers });
+  }
+
+  // === MAGASINS ===
   getMagasins(): Observable<any> {
     const headers = this.getAuthHeaders();
     return this.http.get(`${this.apiUrl}/magasins`, { headers });
   }
 
-  getCategories(): Observable<any> {
-    const headers = this.getAuthHeaders();
-    return this.http.get(`${this.apiUrl}/categories`, { headers });
-  }
-
-  getProduits(): Observable<any> {
-    const headers = this.getAuthHeaders();
-    return this.http.get(`${this.apiUrl}/produits`, { headers });
-  }
-
   addMagasin(magasinData: any): Observable<any> {
     const headers = this.getAuthHeaders();
-    // Supprimer le champ image des données envoyées
     const { image, ...dataWithoutImage } = magasinData;
     return this.http.post(`${this.apiUrl}/magasins`, dataWithoutImage, { headers });
   }
 
   updateMagasin(id: number, magasinData: any): Observable<any> {
     const headers = this.getAuthHeaders();
-    // Supprimer le champ image des données envoyées
     const { image, ...dataWithoutImage } = magasinData;
     return this.http.put(`${this.apiUrl}/magasins/${id}`, dataWithoutImage, { headers });
   }
@@ -103,6 +97,12 @@ export class AuthService {
   deleteMagasin(id: number): Observable<any> {
     const headers = this.getAuthHeaders();
     return this.http.delete(`${this.apiUrl}/magasins/${id}`, { headers });
+  }
+
+  // === CATÉGORIES ===
+  getCategories(): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.get(`${this.apiUrl}/categories`, { headers });
   }
 
   addCategorie(categorieData: any): Observable<any> {
@@ -120,16 +120,20 @@ export class AuthService {
     return this.http.delete(`${this.apiUrl}/categories/${id}`, { headers });
   }
 
+  // === PRODUITS ===
+  getProduits(): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.get(`${this.apiUrl}/produits`, { headers });
+  }
+
   addProduit(produitData: any): Observable<any> {
     const headers = this.getAuthHeaders();
-    // Supprimer le champ image des données envoyées
     const { image, ...dataWithoutImage } = produitData;
     return this.http.post(`${this.apiUrl}/produits`, dataWithoutImage, { headers });
   }
 
   updateProduit(id: number, produitData: any): Observable<any> {
     const headers = this.getAuthHeaders();
-    // Supprimer le champ image des données envoyées
     const { image, ...dataWithoutImage } = produitData;
     return this.http.put(`${this.apiUrl}/produits/${id}`, dataWithoutImage, { headers });
   }
@@ -139,6 +143,65 @@ export class AuthService {
     return this.http.delete(`${this.apiUrl}/produits/${id}`, { headers });
   }
 
+  // === MOUVEMENTS STOCK ===
+  getMouvements(): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.get(`${this.apiUrl}/mouvements`, { headers });
+  }
+
+  addMouvement(mouvementData: any): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.post(`${this.apiUrl}/mouvements`, mouvementData, { headers });
+  }
+
+  updateMouvement(id: number, mouvementData: any): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.put(`${this.apiUrl}/mouvements/${id}`, mouvementData, { headers });
+  }
+
+  deleteMouvement(id: number): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.delete(`${this.apiUrl}/mouvements/${id}`, { headers });
+  }
+
+  // === STOCK ACTUEL ===
+  getStockActuel(): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.get(`${this.apiUrl}/stock`, { headers });
+  }
+
+  // === VENTES ===
+  getVentesStats(filters?: any): Observable<any> {
+    const headers = this.getAuthHeaders();
+    let url = `${this.apiUrl}/ventes/stats`;
+    if (filters) {
+      const params = new URLSearchParams(filters).toString();
+      url += `?${params}`;
+    }
+    return this.http.get(url, { headers });
+  }
+
+  getTopProduits(): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.get(`${this.apiUrl}/ventes/top-produits`, { headers });
+  }
+
+  getEvolutionCA(): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.get(`${this.apiUrl}/ventes/evolution-ca`, { headers });
+  }
+
+  getVentesParCategorie(): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.get(`${this.apiUrl}/ventes/par-categorie`, { headers });
+  }
+
+  getVentesRecentes(): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.get(`${this.apiUrl}/ventes/recentes`, { headers });
+  }
+
+  // === MÉTHODES PRIVÉES ===
   private getAuthHeaders(): HttpHeaders {
     const token = this.getToken();
     return new HttpHeaders({

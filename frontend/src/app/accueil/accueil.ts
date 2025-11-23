@@ -17,30 +17,25 @@ export class Accueil {
   showVideoModal = false;
   showVerificationModal = false;
   show2FAModal = false;
-  
   loginData = {
     email: '',
     password: ''
   };
-  
   registerData = {
     name: '',
     email: '',
     password: '',
     confirmPassword: ''
   };
-
   verificationData = {
     userId: '',
     code: ''
   };
-
   isLoading = false;
   errorMessage = '';
   successMessage = '';
   videoUrl: SafeResourceUrl;
   currentUserId: string = '';
-
   constructor(
     private authService: AuthService,
     private router: Router,
@@ -50,23 +45,17 @@ export class Accueil {
       'https://www.youtube.com/embed/qHwj1sTpdcA'
     );
   }
-
-  // Méthode pour ouvrir la popup d'authentification
   openAuthModal() {
     this.showAuthModal = true;
     this.showLoginTab = true;
     this.resetForms();
   }
-
-  // Méthode pour fermer la popup
   closeAuthModal() {
     this.showAuthModal = false;
     this.showVerificationModal = false;
     this.show2FAModal = false;
     this.resetForms();
   }
-
-  // Réinitialiser tous les formulaires
   resetForms() {
     this.loginData = { email: '', password: '' };
     this.registerData = { name: '', email: '', password: '', confirmPassword: '' };
@@ -75,22 +64,26 @@ export class Accueil {
     this.successMessage = '';
     this.currentUserId = '';
   }
-
-  // Méthode pour basculer vers l'onglet inscription
   showRegister() {
     this.showLoginTab = false;
     this.errorMessage = '';
+    this.successMessage = '';
   }
-
-  // Méthode pour basculer vers l'onglet connexion
   showLogin() {
     this.showLoginTab = true;
     this.errorMessage = '';
+    this.successMessage = '';
   }
-
-  // Méthode pour la connexion - CORRIGÉE
   onLogin() {
     console.log('🚨 onLogin() appelée !', this.loginData);
+    
+    // Validation de l'email côté client
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(this.loginData.email)) {
+      this.errorMessage = 'Format d\'email invalide';
+      return;
+    }
+
     this.isLoading = true;
     this.errorMessage = '';
 
@@ -100,16 +93,12 @@ export class Accueil {
         console.log('Réponse connexion:', response);
         
         if (response.requires2FA && response.userId) {
-          // Double authentification requise
           this.currentUserId = response.userId;
-          this.showAuthModal = false; // Ferme la popup d'authentification principale
-          this.show2FAModal = true;   // Ouvre la popup de vérification 2FA
+          this.showAuthModal = false; 
+          this.show2FAModal = true;  
           this.successMessage = 'Code de sécurité envoyé à votre email';
-          
-          // Réinitialiser le formulaire de connexion
           this.loginData = { email: '', password: '' };
         } else if (response.token && response.user) {
-          // Connexion directe (sans 2FA) - Redirection vers magasin
           this.closeAuthModal();
           this.router.navigate(['/magasin']);
         }
@@ -121,8 +110,6 @@ export class Accueil {
       }
     });
   }
-
-  // Méthode pour vérifier le code 2FA - CORRIGÉE
   onVerify2FA() {
     if (!this.verificationData.code) {
       this.errorMessage = 'Veuillez entrer le code de sécurité reçu par email';
@@ -141,7 +128,6 @@ export class Accueil {
         console.log('Vérification 2FA réussie:', response);
         
         if (response.token && response.user) {
-          // Connexion réussie - Redirection vers la page catégorie/magasin
           this.closeAuthModal();
           this.router.navigate(['/magasin']);
           this.successMessage = 'Connexion réussie!';
@@ -155,7 +141,6 @@ export class Accueil {
     });
   }
 
-  // Méthode pour renvoyer le code 2FA
   onResend2FA() {
     this.isLoading = true;
     this.errorMessage = '';
@@ -171,11 +156,16 @@ export class Accueil {
       }
     });
   }
-
-  // Méthode pour l'inscription
   onRegister() {
     console.log('🚨 onRegister() appelée !', this.registerData);
     
+    // Validation de l'email côté client
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(this.registerData.email)) {
+      this.errorMessage = 'Format d\'email invalide';
+      return;
+    }
+
     if (this.registerData.password !== this.registerData.confirmPassword) {
       this.errorMessage = 'Les mots de passe ne correspondent pas';
       return;
@@ -188,18 +178,31 @@ export class Accueil {
 
     this.isLoading = true;
     this.errorMessage = '';
+    this.successMessage = '';
 
     this.authService.register(this.registerData).subscribe({
       next: (response) => {
         this.isLoading = false;
         console.log('Inscription réussie:', response);
         
-        if (response.requiresVerification && response.userId) {
-          // Vérification du compte requise
-          this.currentUserId = response.userId;
-          this.showAuthModal = false;
-          this.showVerificationModal = true;
-          this.successMessage = 'Compte créé! Vérifiez votre email pour le code d\'activation.';
+        if (response.success) {
+          // Compte créé avec succès - on affiche un message et on reste sur la modale
+          this.successMessage = response.message;
+          
+          // On pré-remplit l'email dans le formulaire de connexion
+          this.loginData.email = this.registerData.email;
+          this.loginData.password = ''; // On vide le mot de passe pour la sécurité
+          
+          // On passe à l'onglet connexion mais on garde la modale ouverte
+          this.showLoginTab = true;
+          
+          // On réinitialise seulement les données d'inscription
+          this.registerData = { name: '', email: '', password: '', confirmPassword: '' };
+          
+          // Message temporaire qui disparaît après 3 secondes
+          setTimeout(() => {
+            this.successMessage = '';
+          }, 3000);
         }
       },
       error: (error) => {
@@ -209,8 +212,6 @@ export class Accueil {
       }
     });
   }
-
-  // Méthode pour vérifier le compte après inscription
   onVerifyAccount() {
     if (!this.verificationData.code) {
       this.errorMessage = 'Veuillez entrer le code de vérification';
@@ -228,8 +229,6 @@ export class Accueil {
         this.isLoading = false;
         console.log('Compte vérifié:', response);
         this.successMessage = 'Compte activé avec succès! Vous pouvez maintenant vous connecter.';
-        
-        // Retour à la connexion après 2 secondes
         setTimeout(() => {
           this.showVerificationModal = false;
           this.showLoginTab = true;
@@ -243,8 +242,6 @@ export class Accueil {
       }
     });
   }
-
-  // Méthode pour renvoyer le code de vérification
   onResendVerification() {
     this.isLoading = true;
     this.errorMessage = '';
@@ -260,24 +257,16 @@ export class Accueil {
       }
     });
   }
-
-  // Méthode pour démarrer l'essai gratuit
   startFreeTrial() {
     console.log('Démarrage de l\'essai gratuit');
     this.openAuthModal();
   }
-
-  // Méthode pour ouvrir la popup vidéo
   openVideoModal() {
     this.showVideoModal = true;
   }
-
-  // Méthode pour fermer la popup vidéo
   closeVideoModal() {
     this.showVideoModal = false;
   }
-
-  // Méthode pour regarder la démo
   watchDemo() {
     console.log('Lecture de la démo vidéo');
     this.openVideoModal();

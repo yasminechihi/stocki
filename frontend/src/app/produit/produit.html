@@ -1,6 +1,4 @@
 <div class="app-container">
-  
-  <!-- NAVBAR -->
   <header class="navbar">
     <div class="nav-left">
       <div class="logo">
@@ -8,45 +6,36 @@
         <span class="logo-text">Stocki</span>
       </div>
     </div>
-
     <div class="user-info">
       <img src="assets/user.jpg" />
       <span *ngIf="currentUser">Bonjour {{ currentUser.name }}</span>
       <button class="logout-btn" (click)="logout()">Déconnexion</button>
     </div>
   </header>
-
-  <!-- WRAPPER GLOBAL -->
   <div class="container">
-
-    <!-- SIDEBAR -->
     <aside class="sidebar">
       <ul class="menu">
-        <li>📊 Tableau de bord</li>
+        <li>
+          <a routerLink="/dashboard" class="nav-link">📊 Tableau de bord</a>
+        </li>
         <li><a routerLink="/magasin" class="nav-link">🏪 Magasins</a></li>
         <li><a routerLink="/categorie" class="nav-link">📂 Catégories</a></li>
         <li class="active">
           <a routerLink="/produit" class="nav-link">📦 Produits</a>
         </li>
+        <li><a routerLink="/ventes" class="nav-link">💰 Ventes</a></li>
+        <li><a routerLink="/stock" class="nav-link">📈 Stock</a></li>
+        <li><a routerLink="/mouvements" class="nav-link">🔄 Mouvements</a></li>
       </ul>
     </aside>
-
-    <!-- CONTENT RIGHT -->
     <main class="content">
-
-      <!-- SECTION BIENVENUE -->
       <div class="welcome-section" *ngIf="currentUser">
         <h2>Vos Produits, {{ currentUser.name }}</h2>
       </div>
-
-      <!-- LOADING -->
       <div class="loading" *ngIf="isLoading">
         <p>Chargement des produits...</p>
       </div>
-
-      <!-- LISTE DES PRODUITS -->
       <div class="produit-list" *ngIf="!isLoading">
-
         <div class="item-row header-row">
           <div class="col name">Nom</div>
           <div class="col code">Code</div>
@@ -58,32 +47,23 @@
             <span class="icon-btn add-btn" (click)="addProduit()" title="Ajouter un produit">➕</span>
           </div>
         </div>
-
         <div class="item-row" *ngFor="let p of produits">
           <div class="col name">{{ p.nom }}</div>
           <div class="col code">{{ p.code }}</div>
           <div class="col type">{{ p.type }}</div>
           <div class="col prix">{{ p.prix }} DT</div>
           <div class="col adresse">{{ p.adresse }}</div>
-
           <div class="col actions">
             <span class="icon-btn edit-btn" (click)="editProduit(p)" title="Modifier">✏️</span>
             <span class="icon-btn delete-btn" (click)="deleteProduit(p)" title="Supprimer">🗑️</span>
           </div>
         </div>
-
-        <!-- Message si aucun produit -->
         <div class="no-data" *ngIf="produits.length === 0 && !isLoading">
           Aucun produit trouvé. Créez votre premier produit!
         </div>
-
       </div>
-
     </main>
-
   </div>
-
-  <!-- POPUP DE MODIFICATION -->
   <div class="popup-overlay" *ngIf="showEditPopup">
     <div class="popup">
       <h3>{{ selectedProduit?.id === 0 ? 'Ajouter' : 'Modifier' }} le produit</h3>
@@ -150,8 +130,6 @@
       </div>
     </div>
   </div>
-
-  <!-- POPUP DE SUPPRESSION -->
   <div class="popup-overlay" *ngIf="showDeletePopup">
     <div class="popup">
       <h3>Confirmer la suppression</h3>
@@ -165,5 +143,4 @@
       </div>
     </div>
   </div>
-
 </div>

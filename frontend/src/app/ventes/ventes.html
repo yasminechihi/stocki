@@ -1,0 +1,226 @@
+<div class="app-container">
+  <header class="navbar">
+    <div class="nav-left">
+      <div class="logo">
+        <img src="assets/logo.png" class="logo-img" />
+        <span class="logo-text">Stocki</span>
+      </div>
+    </div>
+    <div class="user-info">
+      <img src="assets/user.jpg" />
+      <span *ngIf="currentUser">Bonjour {{ currentUser.name }}</span>
+      <button class="logout-btn" (click)="logout()">Déconnexion</button>
+    </div>
+  </header>
+  
+  <div class="container">
+    <aside class="sidebar">
+      <ul class="menu">
+        <li>
+          <a routerLink="/dashboard" class="nav-link">📊 Tableau de bord</a>
+        </li>
+        <li><a routerLink="/magasin" class="nav-link">🏪 Magasins</a></li>
+        <li>
+          <a routerLink="/categorie" class="nav-link">📂 Catégories</a>
+        </li>
+        <li><a routerLink="/produit" class="nav-link">📦 Produits</a></li>
+        <li class="active">
+          <a routerLink="/ventes" class="nav-link">💰 Ventes</a>
+        </li>
+        <li><a routerLink="/stock" class="nav-link">📈 Stock</a></li>
+        <li><a routerLink="/mouvements" class="nav-link">🔄 Mouvements</a></li>
+      </ul>
+    </aside>
+
+    <main class="content">
+      <!-- En-tête avec statistiques -->
+      <div class="welcome-section" *ngIf="currentUser">
+        <h2>Gestion des Ventes, {{ currentUser.name }}</h2>
+        <div class="stats-overview">
+          <div class="stat-item">
+            <span class="stat-value">{{ statsVentes.caTotal | currency:'DT':'symbol':'1.2-2' }}</span>
+            <span class="stat-label">CA Total</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value">{{ statsVentes.caAujourdhui | currency:'DT':'symbol':'1.2-2' }}</span>
+            <span class="stat-label">CA Aujourd'hui</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value">{{ statsVentes.caMois | currency:'DT':'symbol':'1.2-2' }}</span>
+            <span class="stat-label">CA Ce Mois</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value">{{ statsVentes.quantiteVendue }}</span>
+            <span class="stat-label">Produits Vendus</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filtres -->
+      <div class="filters-section">
+        <div class="filter-group">
+          <label>Période du:</label>
+          <input type="date" [(ngModel)]="dateDebut" class="form-input">
+        </div>
+        <div class="filter-group">
+          <label>au:</label>
+          <input type="date" [(ngModel)]="dateFin" class="form-input">
+        </div>
+        <button class="btn btn-primary" (click)="appliquerFiltres()">🔍 Appliquer</button>
+        <button class="btn btn-secondary" (click)="reinitialiserFiltres()">🔄 Réinitialiser</button>
+      </div>
+
+      <!-- Loading -->
+      <div class="loading" *ngIf="isLoading">
+        <p>Chargement des ventes...</p>
+      </div>
+
+      <!-- Liste des ventes -->
+      <div class="ventes-list" *ngIf="!isLoading">
+        <div class="item-row header-row">
+          <div class="col produit">Produit</div>
+          <div class="col code">Code</div>
+          <div class="col client">Client</div>
+          <div class="col quantite">Quantité</div>
+          <div class="col prix">Prix Unitaire</div>
+          <div class="col total">Total</div>
+          <div class="col date">Date</div>
+          <div class="col statut">Statut</div>
+          <div class="col actions">
+            Actions
+            <span class="icon-btn add-btn" (click)="addVente()" title="Ajouter une vente">➕</span>
+          </div>
+        </div>
+        
+        <div class="item-row" *ngFor="let v of ventes">
+          <div class="col produit">{{ v.produit }}</div>
+          <div class="col code">{{ v.code }}</div>
+          <div class="col client">{{ v.client }}</div>
+          <div class="col quantite">{{ v.quantite }}</div>
+          <div class="col prix">{{ v.prix | currency:'DT':'symbol':'1.2-2' }}</div>
+          <div class="col total">{{ v.total | currency:'DT':'symbol':'1.2-2' }}</div>
+          <div class="col date">{{ v.date | date:'dd/MM/yyyy' }}</div>
+          <div class="col statut">
+            <span class="statut-badge" [ngClass]="getStatutClass(v.statut)">{{ v.statut }}</span>
+          </div>
+          <div class="col actions">
+            <span class="icon-btn edit-btn" (click)="editVente(v)" title="Modifier">✏️</span>
+            <span class="icon-btn delete-btn" (click)="deleteVente(v)" title="Supprimer">🗑️</span>
+          </div>
+        </div>
+        
+        <div class="no-data" *ngIf="ventes.length === 0 && !isLoading">
+          Aucune vente trouvée. Créez votre première vente!
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Popup Ajout/Modification Vente (taille réduite) -->
+  <div class="popup-overlay" *ngIf="showEditPopup">
+    <div class="popup">
+      <h3>{{ selectedVente?.id === 0 ? 'Ajouter' : 'Modifier' }} une vente</h3>
+      <div class="popup-content">
+        <div class="form-group">
+          <label>Produit:</label>
+          <select 
+            #produitSelect
+            (change)="onProduitChange($event)"
+            class="form-select"
+          >
+            <option value="">Sélectionnez un produit</option>
+            <option 
+              *ngFor="let produit of produits" 
+              [value]="produit.id"
+              [selected]="selectedVente?.produit_id == produit.id"
+            >
+              {{ produit.nom }} ({{ produit.code }}) - {{ produit.prix | currency:'DT':'symbol':'1.2-2' }}
+            </option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Client:</label>
+          <input 
+            type="text" 
+            [value]="selectedVente?.client" 
+            #clientInput
+            (input)="updateVenteField('client', clientInput.value)"
+            class="form-input"
+            placeholder="Nom du client"
+          >
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Quantité:</label>
+            <input 
+              type="number" 
+              [value]="selectedVente?.quantite" 
+              #quantiteInput
+              (input)="updateVenteField('quantite', quantiteInput.value)"
+              class="form-input"
+              min="1"
+              step="1"
+            >
+          </div>
+          <div class="form-group">
+            <label>Prix unitaire (DT):</label>
+            <input 
+              type="number" 
+              [value]="selectedVente?.prix" 
+              #prixInput
+              (input)="updateVenteField('prix', prixInput.value)"
+              class="form-input"
+              step="0.01"
+              min="0"
+            >
+          </div>
+        </div>
+        <div class="form-group total-display">
+          <label>Total: </label>
+          <span class="total-amount">{{ selectedVente?.total | currency:'DT':'symbol':'1.2-2' }}</span>
+        </div>
+        <div class="form-group">
+          <label>Date de vente:</label>
+          <input 
+            type="date" 
+            [value]="selectedVente?.date" 
+            #dateInput
+            (input)="updateVenteField('date', dateInput.value)"
+            class="form-input"
+          >
+        </div>
+        <div class="form-group">
+          <label>Statut:</label>
+          <select 
+            #statutSelect
+            (change)="updateVenteField('statut', statutSelect.value)"
+            class="form-select"
+          >
+            <option value="En attente" [selected]="selectedVente?.statut === 'En attente'">En attente</option>
+            <option value="Complétée" [selected]="selectedVente?.statut === 'Complétée'">Complétée</option>
+            <option value="Annulée" [selected]="selectedVente?.statut === 'Annulée'">Annulée</option>
+          </select>
+        </div>
+      </div>
+      <div class="popup-actions">
+        <button class="btn btn-cancel" (click)="closePopups()">Annuler</button>
+        <button class="btn btn-confirm" (click)="confirmEdit()">Confirmer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Popup Confirmation Suppression -->
+  <div class="popup-overlay" *ngIf="showDeletePopup">
+    <div class="popup">
+      <h3>Confirmer la suppression</h3>
+      <div class="popup-content">
+        <p>Êtes-vous sûr de vouloir supprimer la vente de <strong>"{{ selectedVente?.produit }}"</strong> ?</p>
+        <p class="warning-text">Cette action est irréversible !</p>
+      </div>
+      <div class="popup-actions">
+        <button class="btn btn-cancel" (click)="closePopups()">Annuler</button>
+        <button class="btn btn-danger" (click)="confirmDelete()">Supprimer</button>
+      </div>
+    </div>
+  </div>
+</div>

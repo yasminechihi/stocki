@@ -1,0 +1,246 @@
+<div class="app-container">
+  <header class="navbar">
+    <div class="nav-left">
+      <div class="logo">
+        <img src="assets/logo.png" class="logo-img" />
+        <span class="logo-text">Stocki</span>
+      </div>
+    </div>
+    <div class="user-info">
+      <img src="assets/user.jpg" />
+      <span *ngIf="currentUser">Bonjour {{ currentUser.name }}</span>
+      <button class="logout-btn" (click)="logout()">Déconnexion</button>
+    </div>
+  </header>
+  
+  <div class="container">
+    <aside class="sidebar">
+      <ul class="menu">
+        <li>
+          <a routerLink="/dashboard" class="nav-link">📊 Tableau de bord</a>
+        </li>
+        <li><a routerLink="/magasin" class="nav-link">🏪 Magasins</a></li>
+        <li>
+          <a routerLink="/categorie" class="nav-link">📂 Catégories</a>
+        </li>
+        <li><a routerLink="/produit" class="nav-link">📦 Produits</a></li>
+        <li>
+          <a routerLink="/ventes" class="nav-link">💰 Ventes</a>
+        </li>
+        <li class="active"><a routerLink="/stock" class="nav-link">📈 Stock</a></li>
+        <li><a routerLink="/mouvements" class="nav-link">🔄 Mouvements</a></li>
+      </ul>
+    </aside>
+
+    <main class="content">
+      <!-- En-tête avec statistiques -->
+      <div class="welcome-section" *ngIf="currentUser">
+        <h2>Stock Actuel, {{ currentUser.name }}</h2>
+        <div class="stats-overview">
+          <div class="stat-item">
+            <span class="stat-value">{{ statsStock.totalProduits }}</span>
+            <span class="stat-label">Produits en Stock</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value">{{ statsStock.valeurTotale | currency:'DT':'symbol':'1.2-2' }}</span>
+            <span class="stat-label">Valeur Totale</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value">{{ statsStock.produitsFaibleStock }}</span>
+            <span class="stat-label">Stock Faible</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value">{{ statsStock.produitsRupture }}</span>
+            <span class="stat-label">En Rupture</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filtres -->
+      <div class="filters-section">
+        <div class="filter-group">
+          <label>Magasin:</label>
+          <input 
+            type="text" 
+            [(ngModel)]="filtreMagasin" 
+            class="form-input"
+            placeholder="Filtrer par magasin"
+          >
+        </div>
+        <div class="filter-group">
+          <label>Catégorie:</label>
+          <input 
+            type="text" 
+            [(ngModel)]="filtreCategorie" 
+            class="form-input"
+            placeholder="Filtrer par catégorie"
+          >
+        </div>
+        <div class="filter-group">
+          <label>Produit:</label>
+          <input 
+            type="text" 
+            [(ngModel)]="filtreProduit" 
+            class="form-input"
+            placeholder="Filtrer par produit"
+          >
+        </div>
+        <button class="btn btn-primary" (click)="appliquerFiltres()">🔍 Appliquer</button>
+        <button class="btn btn-secondary" (click)="reinitialiserFiltres()">🔄 Réinitialiser</button>
+      </div>
+
+      <!-- Loading -->
+      <div class="loading" *ngIf="isLoading">
+        <p>Chargement du stock...</p>
+      </div>
+
+      <!-- Liste du stock -->
+      <div class="stock-list" *ngIf="!isLoading">
+        <div class="item-row header-row">
+          <div class="col produit">Produit</div>
+          <div class="col code">Code</div>
+          <div class="col type">Type</div>
+          <div class="col categorie">Catégorie</div>
+          <div class="col magasin">Magasin</div>
+          <div class="col quantite">Quantité</div>
+          <div class="col niveau">Niveau</div>
+          <div class="col valeur">Valeur</div>
+          <div class="col actions">
+            Actions
+          </div>
+        </div>
+        
+        <div class="item-row" *ngFor="let s of getProduitsFiltres()">
+          <div class="col produit">{{ s.produit_nom }}</div>
+          <div class="col code">{{ s.produit_code }}</div>
+          <div class="col type">{{ s.produit_type }}</div>
+          <div class="col categorie">{{ s.categorie_nom }}</div>
+          <div class="col magasin">{{ s.magasin_nom }}</div>
+          <div class="col quantite">{{ s.quantite }}</div>
+          <div class="col niveau">
+            <span class="niveau-badge" [ngClass]="getNiveauStockClass(s.quantite)">
+              {{ getNiveauStockText(s.quantite) }}
+            </span>
+          </div>
+          <div class="col valeur">{{ s.valeur_stock | currency:'DT':'symbol':'1.2-2' }}</div>
+          <div class="col actions">
+            <span class="icon-btn ajuster-btn" (click)="ajusterStock(s)" title="Ajuster stock">📊</span>
+            <span class="icon-btn edit-btn" (click)="editStock(s)" title="Modifier">✏️</span>
+            <span class="icon-btn delete-btn" (click)="deleteStock(s)" title="Supprimer">🗑️</span>
+          </div>
+        </div>
+        
+        <div class="no-data" *ngIf="getProduitsFiltres().length === 0 && !isLoading">
+          Aucun produit en stock trouvé.
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Popup Ajustement Stock -->
+  <div class="popup-overlay" *ngIf="showAjustementPopup">
+    <div class="popup">
+      <h3>Ajuster le Stock</h3>
+      <div class="popup-content">
+        <div class="form-group">
+          <label>Produit:</label>
+          <p class="popup-info">{{ selectedStock?.produit_nom }} ({{ selectedStock?.produit_code }})</p>
+        </div>
+        <div class="form-group">
+          <label>Magasin:</label>
+          <p class="popup-info">{{ selectedStock?.magasin_nom }}</p>
+        </div>
+        <div class="form-group">
+          <label>Quantité actuelle:</label>
+          <p class="popup-info">{{ selectedStock?.quantite }} unités</p>
+        </div>
+        <div class="form-group">
+          <label>Nouvelle quantité:</label>
+          <input 
+            type="number" 
+            [value]="selectedStock?.quantite" 
+            #nouvelleQuantiteInput
+            (input)="updateStockField('nouvelleQuantite', nouvelleQuantiteInput.value)"
+            class="form-input"
+            min="0"
+            step="1"
+          >
+        </div>
+        <div class="form-group">
+          <label>Motif de l'ajustement:</label>
+          <textarea 
+            #motifTextarea
+            (input)="updateStockField('motif', motifTextarea.value)"
+            class="form-textarea"
+            placeholder="Raison de l'ajustement..."
+            rows="3"
+          ></textarea>
+        </div>
+      </div>
+      <div class="popup-actions">
+        <button class="btn btn-cancel" (click)="closePopups()">Annuler</button>
+        <button class="btn btn-confirm" (click)="confirmAjustement()">Ajuster</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Popup Modification Stock -->
+  <div class="popup-overlay" *ngIf="showEditPopup">
+    <div class="popup">
+      <h3>Modifier le Stock</h3>
+      <div class="popup-content">
+        <div class="form-group">
+          <label>Produit:</label>
+          <p class="popup-info">{{ selectedStock?.produit_nom }} ({{ selectedStock?.produit_code }})</p>
+        </div>
+        <div class="form-group">
+          <label>Magasin:</label>
+          <p class="popup-info">{{ selectedStock?.magasin_nom }}</p>
+        </div>
+        <div class="form-group">
+          <label>Quantité:</label>
+          <input 
+            type="number" 
+            [value]="selectedStock?.quantite" 
+            #quantiteInput
+            (input)="updateStockField('quantite', quantiteInput.value)"
+            class="form-input"
+            min="0"
+            step="1"
+          >
+        </div>
+        <div class="form-group">
+          <label>Valeur stock (DT):</label>
+          <input 
+            type="number" 
+            [value]="selectedStock?.valeur_stock" 
+            #valeurInput
+            (input)="updateStockField('valeur_stock', valeurInput.value)"
+            class="form-input"
+            step="0.01"
+            min="0"
+          >
+        </div>
+      </div>
+      <div class="popup-actions">
+        <button class="btn btn-cancel" (click)="closePopups()">Annuler</button>
+        <button class="btn btn-confirm" (click)="confirmEdit()">Modifier</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Popup Confirmation Suppression -->
+  <div class="popup-overlay" *ngIf="showDeletePopup">
+    <div class="popup">
+      <h3>Confirmer la suppression</h3>
+      <div class="popup-content">
+        <p>Êtes-vous sûr de vouloir supprimer <strong>"{{ selectedStock?.produit_nom }}"</strong> du stock ?</p>
+        <p class="warning-text">Cette action mettra la quantité à 0 et est irréversible !</p>
+      </div>
+      <div class="popup-actions">
+        <button class="btn btn-cancel" (click)="closePopups()">Annuler</button>
+        <button class="btn btn-danger" (click)="confirmDelete()">Supprimer</button>
+      </div>
+    </div>
+  </div>
+</div>

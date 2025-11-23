@@ -3,10 +3,10 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'   // dispo partout dans l'app
+  providedIn: 'root'   
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:8000';  // le port où tourne FastAPI
+  private apiUrl = 'http://localhost:8000';  
   
 
   constructor(private http: HttpClient) {}

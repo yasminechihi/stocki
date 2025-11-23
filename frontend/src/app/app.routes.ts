@@ -5,11 +5,24 @@ import { Magasin } from './magasin/magasin';
 import { Categorie } from './categorie/categorie';
 import { Produit } from './produit/produit';
 import { Contact } from './contact/contact';
+import { Dashboard } from './dashboard/dashboard';
+import { Ventes } from './ventes/ventes';
+import { Stock } from './stock/stock';
+import { Mouvements } from './mouvements/mouvements';
 
 export const routes: Routes = [
   { 
+    path: '',  
+    redirectTo: '/accueil',
+    pathMatch: 'full'
+  },
+  { 
     path: 'accueil', 
     component: Accueil
+  },
+  { 
+    path: 'dashboard', 
+    component: Dashboard
   },
   { 
     path: 'contact',
@@ -28,8 +41,19 @@ export const routes: Routes = [
     component: Produit
   },
   { 
-    path: '',  // ← Route par défaut
-    redirectTo: '/accueil',
-    pathMatch: 'full'
+    path: 'ventes', 
+    component: Ventes
+  },
+  { 
+    path: 'stock', 
+    component: Stock
+  },
+  { 
+    path: 'mouvements', 
+    component: Mouvements
+  },
+  { 
+    path: '**',  
+    redirectTo: '/accueil'
   }
 ];

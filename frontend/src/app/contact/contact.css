@@ -1,9 +1,7 @@
-/* Contact Page Styles */
 .contact-page {
   min-height: 100vh;
 }
 
-/* Contact Hero Section */
 .contact-hero {
   background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
   color: white;
@@ -25,10 +23,15 @@
   line-height: 1.6;
 }
 
-/* Contact Section */
 .contact-section {
   padding: 80px 0;
   background: #f8fafc;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
 }
 
 .contact-grid {
@@ -38,7 +41,6 @@
   align-items: start;
 }
 
-/* Contact Form */
 .contact-form-container {
   background: white;
   padding: 3rem;
@@ -73,6 +75,7 @@
   border-radius: 8px;
   font-size: 1rem;
   transition: border-color 0.3s, box-shadow 0.3s;
+  box-sizing: border-box;
 }
 
 .form-group input:focus,
@@ -107,7 +110,12 @@
   transform: translateY(-2px);
 }
 
-/* Contact Info */
+.submit-btn:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+}
+
 .contact-info {
   background: white;
   padding: 3rem;
@@ -160,7 +168,6 @@
   margin-bottom: 0.25rem;
 }
 
-/* Social Links */
 .social-links {
   margin-top: 2rem;
   padding-top: 2rem;
@@ -198,7 +205,6 @@
   transform: translateY(-2px);
 }
 
-/* FAQ Section */
 .faq-section {
   padding: 80px 0;
   background: white;
@@ -237,7 +243,6 @@
   line-height: 1.6;
 }
 
-/* Header Styles (identique à accueil) */
 .header {
   position: fixed;
   top: 0;
@@ -294,7 +299,6 @@
   color: #2563eb;
 }
 
-/* Footer Styles (identique à accueil) */
 .footer {
   background: #0f172a;
   color: white;
@@ -332,7 +336,295 @@
   color: #94a3b8;
 }
 
-/* Responsive Design */
+/* ===== STYLES CORRIGÉS POUR LES POPUPS ===== */
+
+/* Styles pour les modales d'authentification */
+.auth-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  animation: fadeIn 0.3s ease;
+}
+
+.auth-modal-content {
+  position: relative;
+  width: 90%;
+  max-width: 400px;
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  animation: slideUp 0.3s ease;
+  box-sizing: border-box;
+}
+
+.close-auth-modal {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: none;
+  border: none;
+  font-size: 1.75rem;
+  cursor: pointer;
+  color: #64748b;
+  transition: all 0.3s;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  line-height: 1;
+  z-index: 1;
+}
+
+.close-auth-modal:hover {
+  color: #1e293b;
+  background: #f8fafc;
+}
+
+.auth-tab h2 {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #1e293b;
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  width: 100%;
+}
+
+.auth-form .form-group {
+  margin-bottom: 0;
+  width: 100%;
+}
+
+.auth-input {
+  width: 100%;
+  padding: 1rem 1.25rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 1rem;
+  transition: all 0.3s;
+  background: #f8fafc;
+  box-sizing: border-box;
+  display: block;
+}
+
+.auth-input:focus {
+  outline: none;
+  border-color: #2563eb;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.auth-input::placeholder {
+  color: #9ca3af;
+}
+
+.auth-btn {
+  width: 100%;
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin-top: 0.5rem;
+  box-sizing: border-box;
+}
+
+.auth-btn:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.login-btn {
+  background: #2563eb;
+  color: white;
+}
+
+.login-btn:hover:not(:disabled) {
+  background: #1d4ed8;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.3);
+}
+
+.register-btn {
+  background: #059669;
+  color: white;
+}
+
+.register-btn:hover:not(:disabled) {
+  background: #047857;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px -5px rgba(5, 150, 105, 0.3);
+}
+
+.auth-switch {
+  text-align: center;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.auth-switch p {
+  color: #64748b;
+  margin: 0;
+  font-size: 1rem;
+}
+
+.auth-switch a {
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s;
+  margin-left: 0.5rem;
+}
+
+.auth-switch a:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
+}
+
+/* Styles pour les modales de vérification */
+.twofa-instructions {
+  text-align: center;
+  color: #64748b;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+  font-size: 1rem;
+  background: #f8fafc;
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 4px solid #2563eb;
+}
+
+.code-input {
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 0.5rem;
+  padding: 1rem 1.25rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  background: #f8fafc;
+  transition: all 0.3s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.code-input:focus {
+  outline: none;
+  border-color: #2563eb;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.code-input::placeholder {
+  letter-spacing: normal;
+  font-size: 0.9rem;
+  font-weight: normal;
+  color: #9ca3af;
+}
+
+.resend-link {
+  text-align: center;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.resend-link p {
+  color: #64748b;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.resend-link a {
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s;
+  font-size: 0.95rem;
+}
+
+.resend-link a:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
+}
+
+/* Styles pour les messages */
+.success-message {
+  color: #059669;
+  text-align: center;
+  margin-top: 1rem;
+  padding: 12px 16px;
+  background: #f0fdf4;
+  border-radius: 8px;
+  border: 1px solid #bbf7d0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  font-weight: 500;
+}
+
+.error-message {
+  color: #dc2626;
+  text-align: center;
+  margin-top: 1rem;
+  padding: 12px 16px;
+  background: #fef2f2;
+  border-radius: 8px;
+  border: 1px solid #fecaca;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  font-weight: 500;
+}
+
+.loading {
+  text-align: center;
+  margin-top: 1rem;
+  padding: 12px 16px;
+  background: #f8fafc;
+  border-radius: 8px;
+  color: #64748b;
+  font-size: 0.9rem;
+  border: 1px solid #e5e7eb;
+  font-weight: 500;
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { 
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
 @media (max-width: 768px) {
   .contact-hero {
     padding: 120px 0 60px;
@@ -368,10 +660,27 @@
   .contact-method {
     flex-direction: column;
     text-align: center;
+    align-items: center;
   }
   
   .social-icons {
     justify-content: center;
+  }
+  
+  .auth-modal-content {
+    width: 95%;
+    margin: 1rem;
+    padding: 2rem;
+  }
+  
+  .code-input {
+    font-size: 1.3rem;
+    letter-spacing: 0.3rem;
+    padding: 0.875rem 1rem;
+  }
+  
+  .auth-tab h2 {
+    font-size: 1.5rem;
   }
 }
 
@@ -388,160 +697,50 @@
   .contact-hero .hero-description {
     font-size: 1.1rem;
   }
-}
-/* Styles pour la popup d'authentification */
-.auth-modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10000;
-  animation: fadeIn 0.3s ease;
-}
-
-.auth-modal-content {
-  position: relative;
-  width: 90%;
-  max-width: 400px;
-  background: white;
-  border-radius: 12px;
-  padding: 2rem;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-  animation: slideUp 0.3s ease;
-}
-
-.close-auth-modal {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  color: #64748b;
-  transition: color 0.3s;
-}
-
-.close-auth-modal:hover {
-  color: #1e293b;
-}
-
-.auth-tab h2 {
-  text-align: center;
-  margin-bottom: 1.5rem;
-  color: #1e293b;
-  font-size: 1.5rem;
-}
-
-.auth-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.form-group {
-  margin-bottom: 0;
-}
-
-.form-group input {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  border: 2px solid #e5e7eb;
-  border-radius: 8px;
-  font-size: 1rem;
-  transition: border-color 0.3s;
-}
-
-.form-group input:focus {
-  outline: none;
-  border-color: #2563eb;
-}
-
-.auth-btn {
-  width: 100%;
-  padding: 0.75rem 2rem;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s;
-  margin-top: 0.5rem;
-}
-
-.login-btn {
-  background: #2563eb;
-  color: white;
-}
-
-.login-btn:hover {
-  background: #1d4ed8;
-  transform: translateY(-1px);
-}
-
-.register-btn {
-  background: #059669;
-  color: white;
-}
-
-.register-btn:hover {
-  background: #047857;
-  transform: translateY(-1px);
-}
-
-.auth-switch {
-  text-align: center;
-  margin-top: 1.5rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid #e5e7eb;
-}
-
-.auth-switch p {
-  color: #64748b;
-  margin: 0;
-}
-
-.auth-switch a {
-  color: #2563eb;
-  text-decoration: none;
-  font-weight: 500;
-  transition: color 0.3s;
-}
-
-.auth-switch a:hover {
-  color: #1d4ed8;
-  text-decoration: underline;
-}
-
-/* Animations */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slideUp {
-  from { 
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to { 
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Responsive */
-@media (max-width: 480px) {
+  
   .auth-modal-content {
     width: 95%;
     padding: 1.5rem;
   }
   
   .auth-tab h2 {
-    font-size: 1.25rem;
+    font-size: 1.4rem;
+  }
+  
+  .contact-form-container h2,
+  .contact-info h2 {
+    font-size: 1.5rem;
+  }
+  
+  .faq-section h2 {
+    font-size: 2rem;
+  }
+  
+  .faq-item {
+    padding: 1.5rem;
+  }
+  
+  .contact-method {
+    text-align: center;
+  }
+  
+  .contact-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 1.5rem;
+  }
+  
+  .auth-input {
+    padding: 0.875rem 1rem;
+  }
+  
+  .auth-btn {
+    padding: 0.875rem 1.5rem;
+    font-size: 1rem;
+  }
+  
+  .code-input {
+    font-size: 1.2rem;
+    letter-spacing: 0.2rem;
   }
 }

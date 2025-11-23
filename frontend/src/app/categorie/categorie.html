@@ -1,6 +1,4 @@
 <div class="app-container">
-  
-  <!-- NAVBAR -->
   <header class="navbar">
     <div class="nav-left">
       <div class="logo">
@@ -8,45 +6,36 @@
         <span class="logo-text">Stocki</span>
       </div>
     </div>
-
     <div class="user-info">
       <img src="assets/user.jpg" />
       <span *ngIf="currentUser">Bonjour {{ currentUser.name }}</span>
       <button class="logout-btn" (click)="logout()">Déconnexion</button>
     </div>
   </header>
-
-  <!-- WRAPPER GLOBAL -->
   <div class="container">
-
-    <!-- SIDEBAR -->
     <aside class="sidebar">
       <ul class="menu">
-        <li>📊 Tableau de bord</li>
+        <li>
+          <a routerLink="/dashboard" class="nav-link">📊 Tableau de bord</a>
+        </li>
         <li><a routerLink="/magasin" class="nav-link">🏪 Magasins</a></li>
         <li class="active">
           <a routerLink="/categorie" class="nav-link">📂 Catégories</a>
         </li>
         <li><a routerLink="/produit" class="nav-link">📦 Produits</a></li>
+        <li><a routerLink="/ventes" class="nav-link">💰 Ventes</a></li>
+        <li><a routerLink="/stock" class="nav-link">📈 Stock</a></li>
+        <li><a routerLink="/mouvements" class="nav-link">🔄 Mouvements</a></li>
       </ul>
     </aside>
-
-    <!-- CONTENT RIGHT -->
     <main class="content">
-
-      <!-- SECTION BIENVENUE -->
       <div class="welcome-section" *ngIf="currentUser">
         <h2>Vos Catégories, {{ currentUser.name }}</h2>
       </div>
-
-      <!-- LOADING -->
       <div class="loading" *ngIf="isLoading">
         <p>Chargement des catégories...</p>
       </div>
-
-      <!-- LISTE DES CATÉGORIES -->
       <div class="category-list" *ngIf="!isLoading">
-
         <div class="item-row header-row">
           <div class="col code">Code</div>
           <div class="col name">Nom</div>
@@ -56,30 +45,21 @@
             <span class="icon-btn add-btn" (click)="addCategory()" title="Ajouter une catégorie">➕</span>
           </div>
         </div>
-
         <div class="item-row" *ngFor="let c of categories">
           <div class="col code">{{ c.code }}</div>
           <div class="col name">{{ c.nom || c.name }}</div>
           <div class="col description">{{ c.description }}</div>
-
           <div class="col actions">
             <span class="icon-btn edit-btn" (click)="editCategory(c)" title="Modifier">✏️</span>
             <span class="icon-btn delete-btn" (click)="deleteCategory(c)" title="Supprimer">🗑️</span>
           </div>
         </div>
-
-        <!-- Message si aucune catégorie -->
         <div class="no-data" *ngIf="categories.length === 0 && !isLoading">
           Aucune catégorie trouvée. Créez votre première catégorie!
         </div>
-
       </div>
-
     </main>
-
   </div>
-
-  <!-- POPUP DE MODIFICATION -->
   <div class="popup-overlay" *ngIf="showEditPopup">
     <div class="popup">
       <h3>{{ selectedCategory?.id === 0 ? 'Ajouter' : 'Modifier' }} la catégorie</h3>
@@ -122,8 +102,6 @@
       </div>
     </div>
   </div>
-
-  <!-- POPUP DE SUPPRESSION -->
   <div class="popup-overlay" *ngIf="showDeletePopup">
     <div class="popup">
       <h3>Confirmer la suppression</h3>
@@ -137,5 +115,4 @@
       </div>
     </div>
   </div>
-
 </div>

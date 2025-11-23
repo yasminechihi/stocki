@@ -1,6 +1,4 @@
 <div class="app-container">
-  
-  <!-- NAVBAR -->
   <header class="navbar">
     <div class="nav-left">
       <div class="logo">
@@ -8,45 +6,36 @@
         <span class="logo-text">Stocki</span>
       </div>
     </div>
-
     <div class="user-info">
       <img src="assets/user.jpg" />
       <span *ngIf="currentUser">Bonjour {{ currentUser.name }}</span>
       <button class="logout-btn" (click)="logout()">Déconnexion</button>
     </div>
   </header>
-
-  <!-- WRAPPER GLOBAL -->
   <div class="container">
-
-    <!-- SIDEBAR -->
     <aside class="sidebar">
       <ul class="menu">
-        <li>📊 Tableau de bord</li>
+        <li>
+          <a routerLink="/dashboard" class="nav-link">📊 Tableau de bord</a>
+        </li>
         <li class="active">
           <a routerLink="/magasin" class="nav-link">🏪 Magasins</a>
         </li>
         <li><a routerLink="/categorie" class="nav-link">📂 Catégories</a></li>
         <li><a routerLink="/produit" class="nav-link">📦 Produits</a></li>
+        <li><a routerLink="/ventes" class="nav-link">💰 Ventes</a></li>
+        <li><a routerLink="/stock" class="nav-link">📈 Stock</a></li>
+        <li><a routerLink="/mouvements" class="nav-link">🔄 Mouvements</a></li>
       </ul>
     </aside>
-
-    <!-- CONTENT RIGHT -->
     <main class="content">
-
-      <!-- SECTION BIENVENUE -->
       <div class="welcome-section" *ngIf="currentUser">
         <h2>Vos Magasins, {{ currentUser.name }}</h2>
       </div>
-
-      <!-- LOADING -->
       <div class="loading" *ngIf="isLoading">
         <p>Chargement des magasins...</p>
       </div>
-
-      <!-- LISTE DES MAGASINS -->
       <div class="magasin-list" *ngIf="!isLoading">
-
         <div class="item-row header-row">
           <div class="col name">Nom</div>
           <div class="col code">Code</div>
@@ -57,7 +46,6 @@
             <span class="icon-btn add-btn" (click)="addMagasin()" title="Ajouter un magasin">➕</span>
           </div>
         </div>
-
         <div class="item-row" *ngFor="let m of magasins">
           <div class="col name">{{ m.nom }}</div>
           <div class="col code">{{ m.code }}</div>
@@ -69,19 +57,12 @@
             <span class="icon-btn delete-btn" (click)="deleteMagasin(m)" title="Supprimer">🗑️</span>
           </div>
         </div>
-
-        <!-- Message si aucun magasin -->
         <div class="no-data" *ngIf="magasins.length === 0 && !isLoading">
           Aucun magasin trouvé. Créez votre premier magasin!
         </div>
-
       </div>
-
     </main>
-
   </div>
-
-  <!-- POPUP DE MODIFICATION -->
   <div class="popup-overlay" *ngIf="showEditPopup">
     <div class="popup">
       <h3>{{ selectedMagasin?.id === 0 ? 'Ajouter' : 'Modifier' }} le magasin</h3>
@@ -128,7 +109,6 @@
             placeholder="Entrez l'adresse"
           >{{ selectedMagasin?.adresse }}</textarea>
         </div>
-        <!-- SUPPRIMÉ: Champ image URL -->
       </div>
       <div class="popup-actions">
         <button class="btn btn-cancel" (click)="closePopups()">Annuler</button>
@@ -136,8 +116,6 @@
       </div>
     </div>
   </div>
-
-  <!-- POPUP DE SUPPRESSION -->
   <div class="popup-overlay" *ngIf="showDeletePopup">
     <div class="popup">
       <h3>Confirmer la suppression</h3>
@@ -151,5 +129,4 @@
       </div>
     </div>
   </div>
-
 </div>

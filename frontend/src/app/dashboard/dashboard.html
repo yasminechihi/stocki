@@ -1,0 +1,230 @@
+<div class="app-container">
+  <header class="navbar">
+    <div class="nav-left">
+      <div class="logo">
+        <img src="assets/logo.png" class="logo-img" />
+        <span class="logo-text">Stocki</span>
+      </div>
+    </div>
+    <div class="user-info">
+      <img src="assets/user.jpg" />
+      <span *ngIf="currentUser">Bonjour {{ currentUser.name }}</span>
+      <button class="logout-btn" (click)="logout()">Déconnexion</button>
+    </div>
+  </header>
+  <div class="container">
+    <aside class="sidebar">
+      <ul class="menu">
+        <li class="active">
+          <a routerLink="/dashboard" class="nav-link">📊 Tableau de bord</a>
+        </li>
+        <li><a routerLink="/magasin" class="nav-link">🏪 Magasins</a></li>
+        <li>
+          <a routerLink="/categorie" class="nav-link">📂 Catégories</a>
+        </li>
+        <li><a routerLink="/produit" class="nav-link">📦 Produits</a></li>
+        <li>
+          <a routerLink="/ventes" class="nav-link">💰 Ventes</a>
+        </li>
+        <li><a routerLink="/stock" class="nav-link">📈 Stock</a></li>
+        <li><a routerLink="/mouvements" class="nav-link">🔄 Mouvements</a></li>
+      </ul>
+    </aside>
+    <main class="content">
+      <!-- Section de bienvenue -->
+      <div class="welcome-section" *ngIf="currentUser">
+        <h2>Bienvenue sur Stocki, {{ currentUser.name }} !</h2>
+        <p>Gérez efficacement votre inventaire et suivez vos performances</p>
+      </div>
+
+      <!-- Indicateur de chargement -->
+      <div class="loading" *ngIf="isLoading">
+        <p>Chargement des données...</p>
+      </div>
+
+      <!-- Grille des statistiques -->
+      <div class="stats-grid" *ngIf="!isLoading">
+        <div class="stat-card total">
+          <div class="stat-icon">📊</div>
+          <div class="stat-content">
+            <div class="stat-numbers">
+              <div class="stat-value">{{ dashboardData.totalMouvements }}</div>
+              <div class="stat-label">Total Mouvements</div>
+            </div>
+            <div class="stat-change" [class]="getChangeClass(dashboardData.mouvementChange)">
+              {{ dashboardData.mouvementChange > 0 ? '+' : '' }}{{ dashboardData.mouvementChange }}%
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-card products">
+          <div class="stat-icon">📦</div>
+          <div class="stat-content">
+            <div class="stat-numbers">
+              <div class="stat-value">{{ dashboardData.totalProduits }}</div>
+              <div class="stat-label">Produits</div>
+            </div>
+            <div class="stat-change" [class]="getChangeClass(dashboardData.produitChange)">
+              {{ dashboardData.produitChange > 0 ? '+' : '' }}{{ dashboardData.produitChange }}%
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-card sales">
+          <div class="stat-icon">💰</div>
+          <div class="stat-content">
+            <div class="stat-numbers">
+              <div class="stat-value">{{ formatNumber(dashboardData.valeurStock) }} DT</div>
+              <div class="stat-label">Valeur Stock</div>
+            </div>
+            <div class="stat-change" [class]="getChangeClass(dashboardData.valeurChange)">
+              {{ dashboardData.valeurChange > 0 ? '+' : '' }}{{ dashboardData.valeurChange }}%
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-card stock">
+          <div class="stat-icon">📈</div>
+          <div class="stat-content">
+            <div class="stat-numbers">
+              <div class="stat-value">{{ dashboardData.alertesStock }}</div>
+              <div class="stat-label">Alertes Stock</div>
+            </div>
+            <div class="stat-change change-negative" *ngIf="dashboardData.alertesStock > 0">
+              Attention
+            </div>
+            <div class="stat-change change-positive" *ngIf="dashboardData.alertesStock === 0">
+              OK
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-card magasin">
+          <div class="stat-icon">🏪</div>
+          <div class="stat-content">
+            <div class="stat-numbers">
+              <div class="stat-value">{{ dashboardData.totalMagasins }}</div>
+              <div class="stat-label">Magasins</div>
+            </div>
+            <div class="stat-change change-neutral">
+              Actifs
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-card categorie">
+          <div class="stat-icon">📂</div>
+          <div class="stat-content">
+            <div class="stat-numbers">
+              <div class="stat-value">{{ dashboardData.totalCategories }}</div>
+              <div class="stat-label">Catégories</div>
+            </div>
+            <div class="stat-change change-neutral">
+              Configurées
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions rapides -->
+      <div class="quick-actions" *ngIf="!isLoading">
+        <div class="action-card" (click)="navigateTo('/mouvements')">
+          <span class="action-icon">🔄</span>
+          <div class="action-title">Nouveau Mouvement</div>
+          <div class="action-description">Enregistrer une entrée, sortie ou ajustement de stock</div>
+        </div>
+
+        <div class="action-card" (click)="navigateTo('/produit')">
+          <span class="action-icon">📦</span>
+          <div class="action-title">Ajouter Produit</div>
+          <div class="action-description">Créer un nouveau produit dans l'inventaire</div>
+        </div>
+
+        <div class="action-card" (click)="navigateTo('/ventes')">
+          <span class="action-icon">💰</span>
+          <div class="action-title">Ventes Rapides</div>
+          <div class="action-description">Gérer les ventes et transactions</div>
+        </div>
+
+        <div class="action-card" (click)="navigateTo('/stock')">
+          <span class="action-icon">📈</span>
+          <div class="action-title">État du Stock</div>
+          <div class="action-description">Consulter les niveaux de stock actuels</div>
+        </div>
+      </div>
+
+      <!-- Grille principale -->
+      <div class="dashboard-grid" *ngIf="!isLoading">
+        <!-- Section graphique -->
+        <div class="chart-section">
+          <div class="section-header">
+            <h3>Activité Récente des Mouvements</h3>
+            <div class="section-actions">
+              <button class="btn" (click)="changeChartPeriod('7j')">7J</button>
+              <button class="btn" (click)="changeChartPeriod('30j')">30J</button>
+              <button class="btn" (click)="changeChartPeriod('90j')">90J</button>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas #activityChart></canvas>
+          </div>
+        </div>
+
+        <!-- Section récente -->
+        <div class="recent-section">
+          <div class="section-header">
+            <h3>Mouvements Récents</h3>
+            <div class="section-actions">
+              <button class="btn" (click)="loadRecentMouvements()">Actualiser</button>
+            </div>
+          </div>
+          <ul class="recent-list">
+            <li class="recent-item" *ngFor="let mouvement of recentMouvements">
+              <div class="recent-icon" [class]="mouvement.type_mouvement">
+                {{ getMouvementIcon(mouvement.type_mouvement) }}
+              </div>
+              <div class="recent-content">
+                <div class="recent-title">{{ mouvement.produit_nom || mouvement.produit?.nom }}</div>
+                <div class="recent-details">
+                  {{ mouvement.quantite }} unités • {{ formatNumber(mouvement.prix_unitaire) }} DT
+                  <span *ngIf="mouvement.magasin_nom">• {{ mouvement.magasin_nom }}</span>
+                </div>
+              </div>
+              <div class="recent-date">
+                {{ formatDate(mouvement.date_mouvement) }}
+              </div>
+            </li>
+          </ul>
+          <div class="no-data" *ngIf="recentMouvements.length === 0">
+            Aucun mouvement récent
+          </div>
+        </div>
+      </div>
+
+      <!-- Section produits bas stock -->
+      <div class="chart-section" *ngIf="!isLoading && lowStockProducts.length > 0">
+        <div class="section-header">
+          <h3>📢 Produits en Stock Faible</h3>
+          <div class="section-actions">
+            <button class="btn" (click)="navigateTo('/stock')">Voir Stock</button>
+          </div>
+        </div>
+        <div class="recent-list">
+          <li class="recent-item" *ngFor="let product of lowStockProducts">
+            <div class="recent-icon sortie">⚠️</div>
+            <div class="recent-content">
+              <div class="recent-title">{{ product.nom }}</div>
+              <div class="recent-details">
+                Stock: {{ product.quantite }} • Seuil: {{ product.seuil_alerte }}
+                <span *ngIf="product.magasin_nom">• {{ product.magasin_nom }}</span>
+              </div>
+            </div>
+            <div class="recent-date">
+              Alerte
+            </div>
+          </li>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>

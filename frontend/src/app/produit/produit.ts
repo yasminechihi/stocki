@@ -15,23 +15,17 @@ export class Produit implements OnInit {
   produits: any[] = [];
   currentUser: any = null;
   isLoading = true;
-
-  // Variables pour gérer les popups
   showEditPopup: boolean = false;
   showDeletePopup: boolean = false;
   selectedProduit: any = null;
-
   constructor(private authService: AuthService) {}
-
   ngOnInit(): void {
     this.loadUserData();
     this.loadProduits();
   }
-
   loadUserData(): void {
     this.currentUser = this.authService.getCurrentUser();
   }
-
   loadProduits(): void {
     this.isLoading = true;
     this.authService.getProduits().subscribe({
@@ -43,12 +37,10 @@ export class Produit implements OnInit {
       error: (error) => {
         console.error('Erreur chargement produits:', error);
         this.isLoading = false;
-        // Données par défaut si erreur
         this.produits = this.getDefaultProduits();
       }
     });
   }
-
   private getDefaultProduits(): any[] {
     return [
       { 
@@ -74,23 +66,18 @@ export class Produit implements OnInit {
       }
     ];
   }
-
   editProduit(produit: any) {
-    this.selectedProduit = { ...produit }; // Copie du produit
+    this.selectedProduit = { ...produit }; 
     this.showEditPopup = true;
   }
-
   deleteProduit(produit: any) {
     this.selectedProduit = produit;
     this.showDeletePopup = true;
   }
-
   async confirmEdit() {
     if (!this.selectedProduit) return;
-
     try {
       if (this.selectedProduit.id === 0) {
-        // MODE AJOUT
         this.authService.addProduit({
           nom: this.selectedProduit.nom,
           code: this.selectedProduit.code,
@@ -102,7 +89,7 @@ export class Produit implements OnInit {
             console.log('✅ Produit ajouté:', newProduit);
             this.produits.push(newProduit);
             this.closePopups();
-            this.loadProduits(); // Recharger pour s'assurer d'avoir les données fraîches
+            this.loadProduits(); 
           },
           error: (error) => {
             console.error('❌ Erreur ajout produit:', error);
@@ -110,7 +97,6 @@ export class Produit implements OnInit {
           }
         });
       } else {
-        // MODE ÉDITION
         this.authService.updateProduit(this.selectedProduit.id, {
           nom: this.selectedProduit.nom,
           code: this.selectedProduit.code,
@@ -120,7 +106,6 @@ export class Produit implements OnInit {
         }).subscribe({
           next: (updatedProduit) => {
             console.log('✅ Produit modifié:', updatedProduit);
-            // Mettre à jour localement le produit existant
             const index = this.produits.findIndex(p => p.id === this.selectedProduit.id);
             if (index !== -1) {
               this.produits[index] = { ...updatedProduit };
@@ -138,15 +123,12 @@ export class Produit implements OnInit {
       alert('Erreur de connexion au serveur');
     }
   }
-
   async confirmDelete() {
     if (!this.selectedProduit) return;
-
     try {
       this.authService.deleteProduit(this.selectedProduit.id).subscribe({
         next: () => {
           console.log('✅ Produit supprimé avec succès');
-          // Supprimer de la liste locale
           this.produits = this.produits.filter(p => p.id !== this.selectedProduit.id);
           this.closePopups();
         },
@@ -160,24 +142,19 @@ export class Produit implements OnInit {
       alert('Erreur de connexion au serveur');
     }
   }
-
   closePopups() {
     this.showEditPopup = false;
     this.showDeletePopup = false;
     this.selectedProduit = null;
   }
-
-  // Mettre à jour les valeurs du formulaire d'édition
   updateProduitField(field: string, value: string) {
     if (this.selectedProduit) {
       this.selectedProduit[field] = value;
     }
   }
-
   addProduit() {
-    // Ouvrir un popup pour ajouter un nouveau produit
     this.selectedProduit = { 
-      id: 0, // 0 indique un nouveau produit
+      id: 0, 
       nom: '', 
       code: '', 
       type: 'Vente',
@@ -186,7 +163,6 @@ export class Produit implements OnInit {
     };
     this.showEditPopup = true;
   }
-
   logout(): void {
     this.authService.logout();
     window.location.href = '/';

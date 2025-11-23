@@ -3,20 +3,17 @@
   padding: 0;
   box-sizing: border-box;
 }
-
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   line-height: 1.6;
   color: #333;
   background: #fff;
 }
-
 .container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
 }
-
 .header {
   position: fixed;
   top: 0;
@@ -26,11 +23,9 @@ body {
   z-index: 1000;
   border-bottom: 1px solid #f0f0f0;
 }
-
 .navbar {
   padding: 1rem 0;
 }
-
 .nav-container {
   max-width: 1200px;
   margin: 0 auto;
@@ -39,7 +34,6 @@ body {
   justify-content: space-between;
   align-items: center;
 }
-
 .logo {
   display: flex;
   align-items: center;
@@ -48,35 +42,29 @@ body {
   font-size: 1.5rem;
   color: #2563eb;
 }
-
 .logo-img {
   width: 40px;
   height: 40px;
   object-fit: contain;
 }
-
 .nav-menu {
   display: flex;
   align-items: center;
   gap: 2rem;
 }
-
 .nav-link {
   text-decoration: none;
   color: #64748b;
   font-weight: 500;
   transition: color 0.3s;
 }
-
 .nav-link:hover {
   color: #2563eb;
 }
-
 .hero-section {
   padding: 120px 0 80px;
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
 }
-
 .hero-container {
   max-width: 1200px;
   margin: 0 auto;
@@ -86,7 +74,6 @@ body {
   gap: 4rem;
   align-items: center;
 }
-
 .hero-title {
   font-size: 3.5rem;
   font-weight: 700;
@@ -94,27 +81,23 @@ body {
   margin-bottom: 1.5rem;
   color: #1e293b;
 }
-
 .highlight {
   color: #2563eb;
   background: linear-gradient(120deg, #2563eb, #3b82f6);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
-
 .hero-description {
   font-size: 1.25rem;
   color: #64748b;
   margin-bottom: 2rem;
   line-height: 1.6;
 }
-
 .hero-buttons {
   display: flex;
   gap: 1rem;
   margin-bottom: 3rem;
 }
-
 .cta-primary {
   background: #2563eb;
   color: white;
@@ -125,12 +108,10 @@ body {
   cursor: pointer;
   transition: all 0.3s;
 }
-
 .cta-primary:hover {
   background: #1d4ed8;
   transform: translateY(-2px);
 }
-
 .cta-secondary {
   background: white;
   color: #2563eb;
@@ -141,59 +122,48 @@ body {
   cursor: pointer;
   transition: all 0.3s;
 }
-
 .cta-secondary:hover {
   background: #2563eb;
   color: white;
   transform: translateY(-2px);
 }
-
 .hero-stats {
   display: flex;
   gap: 3rem;
 }
-
 .stat-item {
   text-align: center;
 }
-
 .stat-number {
   font-size: 2rem;
   font-weight: 700;
   color: #1e293b;
 }
-
 .stat-label {
   color: #64748b;
   font-size: 0.9rem;
 }
-
-/* Styles pour l'image du dashboard */
 .dashboard-preview {
   position: relative;
   max-width: 600px;
   margin: 0 auto;
 }
-
 .dashboard-image {
   width: 100%;
   height: auto;
   border-radius: 12px;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 }
-
 .hero-image {
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
 }
-
 .features-section {
   padding: 80px 0;
   background: white;
 }
-
 .section-title {
   text-align: center;
   font-size: 2.5rem;
@@ -201,13 +171,11 @@ body {
   margin-bottom: 3rem;
   color: #1e293b;
 }
-
 .features-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
   gap: 2rem;
 }
-
 .feature-card {
   background: white;
   padding: 2rem;
@@ -216,78 +184,65 @@ body {
   border: 1px solid #f1f5f9;
   transition: transform 0.3s, box-shadow 0.3s;
 }
-
 .feature-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
 }
-
 .feature-icon {
   font-size: 3rem;
   margin-bottom: 1rem;
 }
-
 .feature-title {
   font-size: 1.25rem;
   font-weight: 600;
   margin-bottom: 1rem;
   color: #1e293b;
 }
-
 .feature-description {
   color: #64748b;
   line-height: 1.6;
 }
-
 .cta-section {
   padding: 80px 0;
   background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
   color: white;
   text-align: center;
 }
-
 .cta-title {
   font-size: 2.5rem;
   font-weight: 700;
   margin-bottom: 1rem;
 }
-
 .cta-description {
   font-size: 1.25rem;
   margin-bottom: 2rem;
   opacity: 0.9;
 }
-
 .cta-primary.large {
   padding: 1.25rem 3rem;
   font-size: 1.125rem;
   background: white;
   color: #2563eb;
 }
-
 .cta-primary.large:hover {
   background: #f8fafc;
   transform: translateY(-2px);
 }
-
 .footer {
   background: #0f172a;
   color: white;
   padding: 60px 0 20px;
 }
-
 .footer-content {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 1fr;
   gap: 3rem;
   margin-bottom: 3rem;
 }
-
 .footer-section h4 {
   margin-bottom: 1rem;
   color: #e2e8f0;
 }
-
 .footer-link {
   display: block;
   color: #94a3b8;
@@ -295,61 +250,48 @@ body {
   margin-bottom: 0.5rem;
   transition: color 0.3s;
 }
-
 .footer-link:hover {
   color: white;
 }
-
 .footer-bottom {
   border-top: 1px solid #334155;
   padding-top: 2rem;
   text-align: center;
   color: #94a3b8;
 }
-
 @media (max-width: 768px) {
   .hero-container {
     grid-template-columns: 1fr;
     text-align: center;
   }
-  
   .hero-title {
     font-size: 2.5rem;
   }
-  
   .hero-buttons {
     flex-direction: column;
     align-items: center;
   }
-  
   .hero-stats {
     justify-content: center;
   }
-  
   .nav-menu {
     display: none;
   }
-  
   .features-grid {
     grid-template-columns: 1fr;
   }
-  
   .footer-content {
     grid-template-columns: 1fr;
     gap: 2rem;
   }
-  
   .dashboard-preview {
     max-width: 100%;
     padding: 0 10px;
   }
-  
   .dashboard-image {
     border-radius: 8px;
   }
 }
-
-/* Styles pour la popup d'authentification */
 .auth-modal-overlay {
   position: fixed;
   top: 0;
@@ -363,7 +305,6 @@ body {
   z-index: 10000;
   animation: fadeIn 0.3s ease;
 }
-
 .auth-modal-content {
   position: relative;
   width: 90%;
@@ -374,7 +315,6 @@ body {
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
   animation: slideUp 0.3s ease;
 }
-
 .close-auth-modal {
   position: absolute;
   top: 15px;
@@ -386,28 +326,23 @@ body {
   color: #64748b;
   transition: color 0.3s;
 }
-
 .close-auth-modal:hover {
   color: #1e293b;
 }
-
 .auth-tab h2 {
   text-align: center;
   margin-bottom: 1.5rem;
   color: #1e293b;
   font-size: 1.5rem;
 }
-
 .auth-form {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
-
 .form-group {
   margin-bottom: 0;
 }
-
 .form-group input {
   width: 100%;
   padding: 0.75rem 1rem;
@@ -416,12 +351,10 @@ body {
   font-size: 1rem;
   transition: border-color 0.3s;
 }
-
 .form-group input:focus {
   outline: none;
   border-color: #2563eb;
 }
-
 .auth-btn {
   width: 100%;
   padding: 0.75rem 2rem;
@@ -432,52 +365,42 @@ body {
   transition: all 0.3s;
   margin-top: 0.5rem;
 }
-
 .login-btn {
   background: #2563eb;
   color: white;
 }
-
 .login-btn:hover {
   background: #1d4ed8;
   transform: translateY(-1px);
 }
-
 .register-btn {
   background: #059669;
   color: white;
 }
-
 .register-btn:hover {
   background: #047857;
   transform: translateY(-1px);
 }
-
 .auth-switch {
   text-align: center;
   margin-top: 1.5rem;
   padding-top: 1.5rem;
   border-top: 1px solid #e5e7eb;
 }
-
 .auth-switch p {
   color: #64748b;
   margin: 0;
 }
-
 .auth-switch a {
   color: #2563eb;
   text-decoration: none;
   font-weight: 500;
   transition: color 0.3s;
 }
-
 .auth-switch a:hover {
   color: #1d4ed8;
   text-decoration: underline;
 }
-
-/* Styles pour la popup vidéo */
 .video-modal-overlay {
   position: fixed;
   top: 0;
@@ -491,7 +414,6 @@ body {
   z-index: 10000;
   animation: fadeIn 0.3s ease;
 }
-
 .video-modal-content {
   position: relative;
   width: 90%;
@@ -501,7 +423,6 @@ body {
   overflow: hidden;
   animation: slideUp 0.3s ease;
 }
-
 .close-video-modal {
   position: absolute;
   top: 15px;
@@ -520,18 +441,15 @@ body {
   justify-content: center;
   transition: background 0.3s;
 }
-
 .close-video-modal:hover {
   background: rgba(0, 0, 0, 0.9);
 }
-
 .video-container {
   position: relative;
   width: 100%;
   padding-bottom: 56.25%; /* Ratio 16:9 */
   height: 0;
 }
-
 .video-container iframe {
   position: absolute;
   top: 0;
@@ -540,8 +458,6 @@ body {
   height: 100%;
   border: none;
 }
-
-/* Styles pour les messages */
 .error-message {
   color: #dc2626;
   text-align: center;
@@ -552,7 +468,6 @@ body {
   border: 1px solid #fecaca;
   font-size: 0.9rem;
 }
-
 .success-message {
   color: #059669;
   text-align: center;
@@ -563,7 +478,6 @@ body {
   border: 1px solid #bbf7d0;
   font-size: 0.9rem;
 }
-
 .loading {
   text-align: center;
   margin-top: 1rem;
@@ -573,32 +487,26 @@ body {
   color: #64748b;
   font-size: 0.9rem;
 }
-
 .resend-link {
   text-align: center;
   margin-top: 1rem;
   padding-top: 1rem;
   border-top: 1px solid #e5e7eb;
 }
-
 .resend-link p {
   color: #64748b;
   font-size: 0.9rem;
   margin-bottom: 0.5rem;
 }
-
 .resend-link a {
   color: #2563eb;
   text-decoration: none;
   font-size: 0.9rem;
   font-weight: 500;
 }
-
 .resend-link a:hover {
   text-decoration: underline;
 }
-
-/* Styles spécifiques pour la popup 2FA */
 .twofa-instructions {
   text-align: center;
   margin-bottom: 1.5rem;
@@ -606,25 +514,20 @@ body {
   font-size: 0.95rem;
   line-height: 1.5;
 }
-
 .code-input {
   text-align: center;
   font-size: 1.2rem;
   font-weight: 600;
   letter-spacing: 2px;
 }
-
 .code-input::placeholder {
   letter-spacing: normal;
   font-weight: normal;
 }
-
-/* Animations */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
 }
-
 @keyframes slideUp {
   from { 
     opacity: 0;
@@ -635,23 +538,18 @@ body {
     transform: translateY(0);
   }
 }
-
-/* Responsive */
 @media (max-width: 480px) {
   .auth-modal-content {
     width: 95%;
     padding: 1.5rem;
   }
-  
   .auth-tab h2 {
     font-size: 1.25rem;
   }
-  
   .video-modal-content {
     width: 95%;
     max-width: 95%;
   }
-  
   .video-container {
     padding-bottom: 56.25%;
   }
