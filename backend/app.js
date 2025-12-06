@@ -135,6 +135,7 @@ app.post("/api/register", async (req, res) => {
     res.status(500).json({ message: "Erreur serveur" });
   }
 });
+
 // === CONNEXION (login) avec envoi email 2FA ===
 app.post("/api/login", (req, res) => {
   const { email, password } = req.body;
@@ -981,13 +982,19 @@ app.get("/api/ventes/recentes", authenticateToken, (req, res) => {
 // === CONTACT ===
 app.post("/api/contact", (req, res) => {
   const { name, email, company, subject, message } = req.body;
+  
+  console.log("📥 Nouveau message de contact reçu:", { name, email, subject });
+  
   if (!name || !email || !subject || !message) {
     return res.status(400).json({ message: "Tous les champs obligatoires doivent être remplis" });
   }
+  
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
     return res.status(400).json({ message: "Format d'email invalide" });
   }
+
+  // 1. Sauvegarder dans la base de données
   conn.query(
     "INSERT INTO contacts (name, email, company, subject, message) VALUES (?, ?, ?, ?, ?)",
     [name, email, company || null, subject, message],
@@ -996,32 +1003,108 @@ app.post("/api/contact", (req, res) => {
         console.error("❌ Erreur insertion contact:", err);
         return res.status(500).json({ message: "Erreur lors de l'envoi du message" });
       }
+      
       console.log("✅ Message de contact sauvegardé - ID:", results.insertId);
-      const mailOptions = {
-        from: process.env.GMAIL_USER,
+      const contactId = results.insertId;
+      
+      // 2. Envoyer un email de confirmation à l'utilisateur
+      const userMailOptions = {
+        from: process.env.CONTACT_FROM_EMAIL || process.env.GMAIL_USER,
         to: email,
         subject: "Confirmation de réception - Stocki",
         html: `
-          <h2>Merci pour votre message !</h2>
-          <p>Nous avons bien reçu votre demande et nous vous répondrons dans les plus brefs délais.</p>
-          <p><strong>Résumé de votre message :</strong></p>
-          <ul>
-            <li><strong>Sujet :</strong> ${subject}</li>
-            <li><strong>Message :</strong> ${message.substring(0, 100)}...</li>
-          </ul>
-          <p>Cordialement,<br>L'équipe Stocki</p>
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <h2 style="color: #2563eb;">Merci pour votre message, ${name} !</h2>
+            <p>Nous avons bien reçu votre demande et nous vous répondrons dans les plus brefs délais.</p>
+            
+            <div style="background-color: #f9fafb; padding: 15px; border-radius: 5px; margin: 20px 0;">
+              <h3 style="margin-top: 0;">Résumé de votre message :</h3>
+              <p><strong>Sujet :</strong> ${subject}</p>
+              <p><strong>Entreprise :</strong> ${company || 'Non spécifié'}</p>
+              <p><strong>Message :</strong></p>
+              <p>${message}</p>
+            </div>
+            
+            <p>Notre équipe vous contactera à l'adresse email que vous avez fournie : <strong>${email}</strong></p>
+            
+            <p style="color: #6b7280; font-size: 14px;">
+              <em>Ceci est un message automatique. Merci de ne pas y répondre.</em>
+            </p>
+            
+            <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
+            
+            <p>Cordialement,<br><strong>L'équipe Stocki</strong><br>
+            📞 +216 70 000 000<br>
+            📧 support@stocki.tn</p>
+          </div>
         `
       };
-      transporter.sendMail(mailOptions, (error) => {
+      
+      // 3. Envoyer un email à votre adresse personnelle
+      const adminMailOptions = {
+        from: process.env.CONTACT_FROM_EMAIL || process.env.GMAIL_USER,
+        to: process.env.CONTACT_DESTINATION_EMAIL || process.env.GMAIL_USER,
+        subject: `🚀 NOUVEAU MESSAGE DE CONTACT: ${subject}`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 700px; margin: 0 auto; padding: 20px;">
+            <h2 style="color: #dc2626;">🚨 NOUVEAU MESSAGE DE CONTACT STOCKI</h2>
+            
+            <div style="background-color: #fef2f2; padding: 20px; border-left: 4px solid #dc2626; margin: 20px 0;">
+              <h3 style="margin-top: 0; color: #dc2626;">📋 Informations du contact</h3>
+              <p><strong>📝 Référence :</strong> CONTACT-${contactId}</p>
+              <p><strong>👤 Nom :</strong> ${name}</p>
+              <p><strong>📧 Email :</strong> <a href="mailto:${email}">${email}</a></p>
+              <p><strong>🏢 Entreprise :</strong> ${company || 'Non spécifié'}</p>
+              <p><strong>📌 Sujet :</strong> ${subject}</p>
+              <p><strong>🕒 Date :</strong> ${new Date().toLocaleString('fr-FR')}</p>
+            </div>
+            
+            <div style="background-color: #f0f9ff; padding: 20px; border-radius: 5px; margin: 20px 0;">
+              <h3 style="color: #0369a1;">📄 Message :</h3>
+              <div style="white-space: pre-wrap; background-color: white; padding: 15px; border-radius: 3px; border: 1px solid #e5e7eb;">
+                ${message}
+              </div>
+            </div>
+            
+            <div style="display: flex; gap: 15px; margin-top: 30px;">
+              <a href="mailto:${email}" style="background-color: #2563eb; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
+                📧 Répondre à ${name}
+              </a>
+              <a href="tel:+21670000000" style="background-color: #059669; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
+                📞 Appeler le contact
+              </a>
+            </div>
+            
+            <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
+            
+            <p style="color: #6b7280; font-size: 12px;">
+              <em>Ce message a été généré automatiquement depuis le formulaire de contact Stocki.</em>
+            </p>
+          </div>
+        `
+      };
+      
+      // Envoyer les deux emails
+      transporter.sendMail(userMailOptions, (error, info) => {
         if (error) {
           console.error("❌ Erreur envoi email confirmation:", error);
         } else {
           console.log("✅ Email de confirmation envoyé à:", email);
         }
       });
+      
+      transporter.sendMail(adminMailOptions, (error, info) => {
+        if (error) {
+          console.error("❌ Erreur envoi email admin:", error);
+        } else {
+          console.log("✅ Email admin envoyé à:", process.env.CONTACT_DESTINATION_EMAIL || process.env.GMAIL_USER);
+        }
+      });
+      
       res.status(201).json({ 
-        message: "Message envoyé avec succès", 
-        contactId: results.insertId 
+        message: "Message envoyé avec succès ! Vous recevrez une confirmation par email.",
+        contactId: contactId,
+        success: true
       });
     }
   );
@@ -1063,4 +1146,7 @@ app.listen(PORT, () => {
   console.log(`📧 Contact: http://localhost:${PORT}/api/contact`);
   console.log(`🔐 Routes auth: http://localhost:${PORT}/api/register | /api/login`);
   console.log(`🏪 Routes protégées: http://localhost:${PORT}/api/magasins | /api/categories | /api/produits`);
+  if (process.env.CONTACT_DESTINATION_EMAIL) {
+    console.log(`📨 Emails de contact envoyés à: ${process.env.CONTACT_DESTINATION_EMAIL}`);
+  }
 });
