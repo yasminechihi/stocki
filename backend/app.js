@@ -8,6 +8,8 @@ const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 app.use(cors());
 app.use(express.json());
+
+// === TRANSPORTEUR EMAIL (GMAIL) ===
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -16,6 +18,16 @@ const transporter = nodemailer.createTransport({
   }
 });
 
+// Vérifier la configuration du transporter (optionnel mais utile pour debug)
+transporter.verify((err, success) => {
+  if (err) {
+    console.error("❌ Erreur configuration transporter:", err);
+  } else {
+    console.log("✅ Transporter email prêt");
+  }
+});
+
+// === MIDDLEWARE D'AUTHENTIFICATION (JWT) ===
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
@@ -46,7 +58,7 @@ app.get("/test-db", (req, res) => {
   });
 });
 
-// === AUTHENTIFICATION ===
+// === INSCRIPTION ===
 app.post("/api/register", async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -123,7 +135,7 @@ app.post("/api/register", async (req, res) => {
     res.status(500).json({ message: "Erreur serveur" });
   }
 });
-
+// === CONNEXION (login) avec envoi email 2FA ===
 app.post("/api/login", (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
@@ -151,6 +163,7 @@ app.post("/api/login", (req, res) => {
     if (!user.is_verified) {
       return res.status(400).json({ message: "Veuillez vérifier votre compte avant de vous connecter" });
     }
+
     const loginCode = Math.floor(100000 + Math.random() * 900000).toString();
     const codeExpires = new Date(Date.now() + 10 * 60 * 1000); 
     conn.query(
@@ -161,13 +174,33 @@ app.post("/api/login", (req, res) => {
           console.error("❌ Erreur DB (UPDATE):", err);
           return res.status(500).json({ message: "Erreur serveur" });
         }
-        console.log('✅ Code de sécurité généré pour', email, ':', loginCode);
-        console.log('🔐 Utilisez ce code dans le popup 2FA:', loginCode);
-        res.json({ 
-          message: "Code de sécurité généré (voir console du serveur)",
-          requires2FA: true,
-          userId: user.id,
-          debugCode: loginCode
+
+        // Envoi du mail contenant le code MFA
+        const mailOptions = {
+          from: process.env.GMAIL_USER,
+          to: email,
+          subject: "Votre code de connexion sécurisé (2FA) - Stocki",
+          html: `
+            <h2>Connexion sécurisée à Stocki</h2>
+            <p>Voici votre code de connexion :</p>
+            <h1 style="letter-spacing:4px">${loginCode}</h1>
+            <p>Ce code est valable 10 minutes.</p>
+          `
+        };
+
+        transporter.sendMail(mailOptions, (error, info) => {
+          if (error) {
+            console.error("❌ Erreur envoi email 2FA:", error);
+            return res.status(500).json({ message: "Erreur lors de l'envoi du code 2FA" });
+          }
+
+          console.log("📧 Code 2FA envoyé à:", email);
+
+          res.json({
+            message: "Code 2FA envoyé par email",
+            requires2FA: true,
+            userId: user.id
+          });
         });
       }
     );
@@ -273,6 +306,7 @@ app.post("/api/resend-verification", (req, res) => {
         };
         transporter.sendMail(mailOptions, (error) => {
           if (error) {
+            console.error("❌ Erreur envoi email verification:", error);
             return res.status(500).json({ message: "Erreur lors de l'envoi de l'email" });
           }
           res.json({ message: "Nouveau code envoyé par email" });
@@ -282,6 +316,7 @@ app.post("/api/resend-verification", (req, res) => {
   });
 });
 
+// RESEND 2FA
 app.post("/api/resend-2fa", (req, res) => {
   const { userId } = req.body;
   
@@ -300,24 +335,41 @@ app.post("/api/resend-2fa", (req, res) => {
         if (err) {
           return res.status(500).json({ message: "Erreur serveur" });
         }
-        console.log('✅ Nouveau code de sécurité pour', user.email, ':', loginCode);
-        
-        res.json({ 
-          message: "Nouveau code généré (voir console)",
-          debugCode: loginCode
+
+        const mailOptions = {
+          from: process.env.GMAIL_USER,
+          to: user.email,
+          subject: "Nouveau code 2FA - Stocki",
+          html: `
+            <h2>Nouveau code de connexion</h2>
+            <p>Voici votre nouveau code : <strong style="font-size:20px">${loginCode}</strong></p>
+            <p>Valable 10 minutes.</p>
+          `
+        };
+
+        transporter.sendMail(mailOptions, (error, info) => {
+          if (error) {
+            console.error("❌ Erreur envoi resend-2fa:", error);
+            return res.status(500).json({ message: "Erreur lors de l'envoi de l'email 2FA" });
+          }
+          console.log("📧 Nouveau code 2FA envoyé à:", user.email);
+          res.json({ message: "Nouveau code envoyé par email" });
         });
       }
     );
   });
 });
 
+/* === DASHBOARD, MAGASINS, CATEGORIES, PRODUITS, MOUVEMENTS, STOCK, VENTES, CONTACT, ETC.
+   Les routes suivantes sont reprises et légèrement nettoyées depuis ton fichier original.
+   Elles conservent toute la logique métier (requêtes SQL, protections JWT, validations).
+   Je garde leur implémentation complète ici pour que tu aies le fichier entier prêt. */
 // === DASHBOARD ===
 app.get("/api/dashboard/stats", authenticateToken, (req, res) => {
   const userId = req.user.userId;
   
   const dashboardData = {};
 
-  // 1. Statistiques générales
   const queryGenerales = `
     SELECT 
       (SELECT COUNT(*) FROM produits WHERE user_id = ?) as total_produits,
@@ -338,7 +390,6 @@ app.get("/api/dashboard/stats", authenticateToken, (req, res) => {
     
     dashboardData.generales = results[0];
 
-    // 2. Produits par catégorie
     const queryCategories = `
       SELECT 
         c.nom as categorie_nom,
@@ -359,7 +410,6 @@ app.get("/api/dashboard/stats", authenticateToken, (req, res) => {
       
       dashboardData.produitsParCategorie = results;
 
-      // 3. Évolution 30 jours
       const queryEvolution = `
         SELECT 
           DATE(created_at) as date_ajout,
@@ -379,7 +429,6 @@ app.get("/api/dashboard/stats", authenticateToken, (req, res) => {
         
         dashboardData.evolution = results;
 
-        // 4. Top 5 catégories
         const queryTopCategories = `
           SELECT 
             c.nom as categorie,
@@ -401,7 +450,6 @@ app.get("/api/dashboard/stats", authenticateToken, (req, res) => {
           
           dashboardData.topCategories = results;
 
-          // 5. Derniers produits ajoutés
           const queryDerniersProduits = `
             SELECT 
               nom,
@@ -422,8 +470,6 @@ app.get("/api/dashboard/stats", authenticateToken, (req, res) => {
             }
             
             dashboardData.derniersProduits = results;
-            
-            // Envoyer toutes les stats
             res.json(dashboardData);
           });
         });
@@ -518,7 +564,7 @@ app.delete("/api/magasins/:id", authenticateToken, (req, res) => {
   );
 });
 
-// === CATÉGORIES ===
+// === CATEGORIES ===
 app.get("/api/categories", authenticateToken, (req, res) => {
   const userId = req.user.userId;
   
@@ -981,6 +1027,7 @@ app.post("/api/contact", (req, res) => {
   );
 });
 
+// === Liste publique de catégories (sans auth) ===
 app.get("/categories", (req, res) => {
   console.log("📥 Requête /categories reçue");
   
@@ -995,6 +1042,7 @@ app.get("/categories", (req, res) => {
   });
 });
 
+// === Récupération des contacts (protégé) ===
 app.get("/api/contacts", authenticateToken, (req, res) => {
   conn.query("SELECT * FROM contacts ORDER BY created_at DESC", (err, results) => {
     if (err) {
@@ -1006,7 +1054,7 @@ app.get("/api/contacts", authenticateToken, (req, res) => {
   });
 });
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`🚀 Backend démarré sur http://localhost:${PORT}`);
   console.log(`🏠 Test: http://localhost:${PORT}/`);
@@ -1015,5 +1063,4 @@ app.listen(PORT, () => {
   console.log(`📧 Contact: http://localhost:${PORT}/api/contact`);
   console.log(`🔐 Routes auth: http://localhost:${PORT}/api/register | /api/login`);
   console.log(`🏪 Routes protégées: http://localhost:${PORT}/api/magasins | /api/categories | /api/produits`);
-  console.log(`📈 Nouvelles routes: http://localhost:${PORT}/api/dashboard | /api/mouvements | /api/stock | /api/ventes`);
 });
