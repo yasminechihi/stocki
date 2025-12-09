@@ -8,7 +8,8 @@
     </div>
     <div class="user-info">
       <img src="assets/user.jpg" />
-      <span *ngIf="currentUser">Bonjour {{ currentUser.name }}</span>
+      <span *ngIf="currentUser">Bonjour {{ currentUser.name }} <small>(ID: {{ currentUser.id || currentUser.userId
+          }})</small></span>
       <button class="logout-btn" (click)="logout()">Déconnexion</button>
     </div>
   </header>
@@ -195,11 +196,12 @@
               </div>
             </li>
           </ul>
-          <div class="no-data" *ngIf="recentMouvements.length === 0">
+          <div class="no-data" *ngIf="recentMouvements?.length === 0">
             Aucun mouvement récent
           </div>
         </div>
       </div>
+
 
       <!-- Section produits bas stock -->
       <div class="chart-section" *ngIf="!isLoading && lowStockProducts.length > 0">

@@ -5,7 +5,8 @@
   font-family: "Segoe UI", "Roboto", sans-serif;
 }
 
-html, body {
+html,
+body {
   width: 100%;
   height: 100%;
   color: #2c3e50;
@@ -94,7 +95,7 @@ html, body {
   list-style: none;
 }
 
-.menu > li {
+.menu>li {
   padding: 12px 18px;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -103,13 +104,13 @@ html, body {
   border-left: 4px solid transparent;
 }
 
-.menu > li:hover {
+.menu>li:hover {
   background: linear-gradient(135deg, #44516f 0%, #3a465f 100%);
   transform: translateX(5px);
   border-left-color: #2563eb;
 }
 
-.menu > li.active {
+.menu>li.active {
   background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
   border-left-color: #ffffff;
   box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
@@ -167,7 +168,7 @@ html, body {
   right: -50%;
   width: 100%;
   height: 200%;
-  background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
   transform: rotate(45deg);
 }
 
@@ -207,8 +208,13 @@ html, body {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .stats-grid {
@@ -353,20 +359,17 @@ html, body {
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: 25px;
-  margin-bottom: 30px;
-}
-
-.chart-section, .recent-section {
-  background: white;
-  padding: 25px;
-  border-radius: 16px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #f8f9fa;
 }
 
 .section-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
+  gap: 20px;
   margin-bottom: 20px;
   padding-bottom: 15px;
   border-bottom: 2px solid #f8f9fa;
@@ -408,6 +411,29 @@ html, body {
 
 .recent-list {
   list-style: none;
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 5px;
+  /* Add some padding for the scrollbar */
+}
+
+/* Custom scrollbar for recent list */
+.recent-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.recent-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.recent-list::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.recent-list::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
 }
 
 .recent-item {
@@ -582,7 +608,7 @@ html, body {
   .dashboard-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .stats-grid {
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   }
@@ -592,41 +618,41 @@ html, body {
   .container {
     flex-direction: column;
   }
-  
+
   .sidebar {
     width: 100%;
     height: auto;
     order: 2;
     padding: 15px 10px;
   }
-  
+
   .content {
     order: 1;
     padding: 15px;
   }
-  
+
   .stats-grid {
     grid-template-columns: 1fr;
     gap: 15px;
   }
-  
+
   .quick-actions {
     grid-template-columns: 1fr;
     gap: 15px;
   }
-  
+
   .stat-card {
     padding: 20px;
   }
-  
+
   .stat-value {
     font-size: 1.8rem;
   }
-  
+
   .welcome-section h2 {
     font-size: 1.6rem;
   }
-  
+
   .welcome-section p {
     font-size: 1rem;
   }
@@ -639,35 +665,36 @@ html, body {
     height: auto;
     gap: 10px;
   }
-  
+
   .nav-left {
     flex-wrap: wrap;
   }
-  
+
   .user-info {
     flex-wrap: wrap;
     justify-content: center;
   }
-  
+
   .logo {
     font-size: 1.3rem;
   }
-  
+
   .logo-img {
     width: 35px;
     height: 35px;
   }
-  
-  .chart-section, .recent-section {
+
+  .chart-section,
+  .recent-section {
     padding: 15px;
   }
-  
+
   .section-header {
     flex-direction: column;
     gap: 10px;
     align-items: flex-start;
   }
-  
+
   .section-actions {
     width: 100%;
     justify-content: space-between;
@@ -680,22 +707,49 @@ html, body {
     opacity: 0;
     transform: translateY(30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
-.stat-card, .chart-section, .recent-section, .action-card {
+.stat-card,
+.chart-section,
+.recent-section,
+.action-card {
   animation: fadeInUp 0.6s ease-out;
 }
 
 /* Délais d'animation pour un effet cascade */
-.stat-card:nth-child(1) { animation-delay: 0.1s; }
-.stat-card:nth-child(2) { animation-delay: 0.2s; }
-.stat-card:nth-child(3) { animation-delay: 0.3s; }
-.stat-card:nth-child(4) { animation-delay: 0.4s; }
-.action-card:nth-child(1) { animation-delay: 0.5s; }
-.action-card:nth-child(2) { animation-delay: 0.6s; }
-.action-card:nth-child(3) { animation-delay: 0.7s; }
-.action-card:nth-child(4) { animation-delay: 0.8s; }
+.stat-card:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.stat-card:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.stat-card:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.stat-card:nth-child(4) {
+  animation-delay: 0.4s;
+}
+
+.action-card:nth-child(1) {
+  animation-delay: 0.5s;
+}
+
+.action-card:nth-child(2) {
+  animation-delay: 0.6s;
+}
+
+.action-card:nth-child(3) {
+  animation-delay: 0.7s;
+}
+
+.action-card:nth-child(4) {
+  animation-delay: 0.8s;
+}
