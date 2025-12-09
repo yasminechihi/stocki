@@ -62,7 +62,7 @@ app.get("/test-db", (req, res) => {
 app.post("/api/register", async (req, res) => {
   try {
     const { name, email, password } = req.body;
-    
+
     if (!name || !email || !password) {
       return res.status(400).json({ message: "Tous les champs sont requis" });
     }
@@ -84,13 +84,13 @@ app.post("/api/register", async (req, res) => {
         }
         return res.status(500).json({ message: "Erreur serveur" });
       }
-      
+
       if (results.length > 0) {
         return res.status(400).json({ message: "Un utilisateur avec cet email existe déjà" });
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
-      
+
       conn.query(
         "INSERT INTO users (name, email, password, is_verified) VALUES (?, ?, ?, ?)",
         [name, email, hashedPassword, true],
@@ -101,7 +101,7 @@ app.post("/api/register", async (req, res) => {
           }
 
           const newUserId = results.insertId;
-          
+
           const mailOptions = {
             from: process.env.GMAIL_USER,
             to: email,
@@ -122,7 +122,7 @@ app.post("/api/register", async (req, res) => {
             }
           });
 
-          res.status(201).json({ 
+          res.status(201).json({
             message: "Compte créé avec succès ! Vous pouvez maintenant vous connecter.",
             userId: newUserId,
             success: true
@@ -166,7 +166,7 @@ app.post("/api/login", (req, res) => {
     }
 
     const loginCode = Math.floor(100000 + Math.random() * 900000).toString();
-    const codeExpires = new Date(Date.now() + 10 * 60 * 1000); 
+    const codeExpires = new Date(Date.now() + 10 * 60 * 1000);
     conn.query(
       "UPDATE users SET login_code = ?, code_expires = ? WHERE id = ?",
       [loginCode, codeExpires, user.id],
@@ -226,10 +226,10 @@ app.post("/api/verify-login", (req, res) => {
       }
       const user = results[0];
       const token = jwt.sign(
-        { 
-          userId: user.id, 
+        {
+          userId: user.id,
           email: user.email,
-          name: user.name 
+          name: user.name
         },
         process.env.JWT_SECRET || 'votre_secret_jwt',
         { expiresIn: '24h' }
@@ -261,7 +261,7 @@ app.post("/api/verify-account", (req, res) => {
         console.error("❌ Erreur DB:", err);
         return res.status(500).json({ message: "Erreur serveur" });
       }
-      
+
       if (results.length === 0) {
         return res.status(400).json({ message: "Code de vérification invalide" });
       }
@@ -320,12 +320,12 @@ app.post("/api/resend-verification", (req, res) => {
 // RESEND 2FA
 app.post("/api/resend-2fa", (req, res) => {
   const { userId } = req.body;
-  
+
   conn.query("SELECT * FROM users WHERE id = ?", [userId], (err, results) => {
     if (err || results.length === 0) {
       return res.status(400).json({ message: "Utilisateur non trouvé" });
     }
-    
+
     const user = results[0];
     const loginCode = Math.floor(100000 + Math.random() * 900000).toString();
     const codeExpires = new Date(Date.now() + 10 * 60 * 1000);
@@ -368,7 +368,7 @@ app.post("/api/resend-2fa", (req, res) => {
 // === DASHBOARD ===
 app.get("/api/dashboard/stats", authenticateToken, (req, res) => {
   const userId = req.user.userId;
-  
+
   const dashboardData = {};
 
   const queryGenerales = `
@@ -388,7 +388,7 @@ app.get("/api/dashboard/stats", authenticateToken, (req, res) => {
       console.error("❌ Erreur stats générales:", err);
       return res.status(500).json({ message: "Erreur serveur" });
     }
-    
+
     dashboardData.generales = results[0];
 
     const queryCategories = `
@@ -408,7 +408,7 @@ app.get("/api/dashboard/stats", authenticateToken, (req, res) => {
         console.error("❌ Erreur stats catégories:", err);
         return res.status(500).json({ message: "Erreur serveur" });
       }
-      
+
       dashboardData.produitsParCategorie = results;
 
       const queryEvolution = `
@@ -427,7 +427,7 @@ app.get("/api/dashboard/stats", authenticateToken, (req, res) => {
           console.error("❌ Erreur stats évolution:", err);
           return res.status(500).json({ message: "Erreur serveur" });
         }
-        
+
         dashboardData.evolution = results;
 
         const queryTopCategories = `
@@ -448,7 +448,7 @@ app.get("/api/dashboard/stats", authenticateToken, (req, res) => {
             console.error("❌ Erreur top catégories:", err);
             return res.status(500).json({ message: "Erreur serveur" });
           }
-          
+
           dashboardData.topCategories = results;
 
           const queryDerniersProduits = `
@@ -469,7 +469,7 @@ app.get("/api/dashboard/stats", authenticateToken, (req, res) => {
               console.error("❌ Erreur derniers produits:", err);
               return res.status(500).json({ message: "Erreur serveur" });
             }
-            
+
             dashboardData.derniersProduits = results;
             res.json(dashboardData);
           });
@@ -482,7 +482,7 @@ app.get("/api/dashboard/stats", authenticateToken, (req, res) => {
 // === MAGASINS ===
 app.get("/api/magasins", authenticateToken, (req, res) => {
   const userId = req.user.userId;
-  
+
   conn.query("SELECT * FROM magasins WHERE user_id = ?", [userId], (err, results) => {
     if (err) {
       console.error("❌ Erreur récupération magasins:", err);
@@ -505,7 +505,7 @@ app.post("/api/magasins", authenticateToken, (req, res) => {
       }
       conn.query("SELECT * FROM magasins WHERE id = ?", [results.insertId], (err, newMagasin) => {
         if (err) {
-          return res.status(201).json({ 
+          return res.status(201).json({
             message: "Magasin créé avec succès",
             magasinId: results.insertId
           });
@@ -528,13 +528,13 @@ app.put("/api/magasins/:id", authenticateToken, (req, res) => {
         console.error("❌ Erreur modification magasin:", err);
         return res.status(500).json({ message: "Erreur serveur" });
       }
-      
+
       if (results.affectedRows === 0) {
         return res.status(404).json({ message: "Magasin non trouvé" });
       }
       conn.query("SELECT * FROM magasins WHERE id = ?", [magasinId], (err, updatedMagasin) => {
         if (err) {
-          return res.json({ 
+          return res.json({
             message: "Magasin modifié avec succès",
             id: magasinId
           });
@@ -559,7 +559,7 @@ app.delete("/api/magasins/:id", authenticateToken, (req, res) => {
       if (results.affectedRows === 0) {
         return res.status(404).json({ message: "Magasin non trouvé" });
       }
-      
+
       res.json({ message: "Magasin supprimé avec succès" });
     }
   );
@@ -568,13 +568,13 @@ app.delete("/api/magasins/:id", authenticateToken, (req, res) => {
 // === CATEGORIES ===
 app.get("/api/categories", authenticateToken, (req, res) => {
   const userId = req.user.userId;
-  
+
   conn.query("SELECT * FROM categories WHERE user_id = ?", [userId], (err, results) => {
     if (err) {
       console.error("❌ Erreur récupération catégories:", err);
       return res.status(500).json({ message: "Erreur serveur" });
     }
-    
+
     res.json(results);
   });
 });
@@ -592,12 +592,12 @@ app.post("/api/categories", authenticateToken, (req, res) => {
       }
       conn.query("SELECT * FROM categories WHERE id = ?", [results.insertId], (err, newCategory) => {
         if (err) {
-          return res.status(201).json({ 
+          return res.status(201).json({
             message: "Catégorie créée avec succès",
             categorieId: results.insertId
           });
         }
-        
+
         res.status(201).json(newCategory[0]);
       });
     }
@@ -607,7 +607,7 @@ app.post("/api/categories", authenticateToken, (req, res) => {
 app.put("/api/categories/:id", authenticateToken, (req, res) => {
   const userId = req.user.userId;
   const categoryId = req.params.id;
-  const { nom, code, description } = req.body; 
+  const { nom, code, description } = req.body;
   conn.query(
     "UPDATE categories SET nom = ?, code = ?, description = ? WHERE id = ? AND user_id = ?",
     [nom, code, description, categoryId, userId],
@@ -615,18 +615,18 @@ app.put("/api/categories/:id", authenticateToken, (req, res) => {
       if (err) {
         console.error("❌ Erreur modification catégorie:", err);
         return res.status(500).json({ message: "Erreur serveur" });
-      } 
+      }
       if (results.affectedRows === 0) {
         return res.status(404).json({ message: "Catégorie non trouvée" });
       }
       conn.query("SELECT * FROM categories WHERE id = ?", [categoryId], (err, updatedCategory) => {
         if (err) {
-          return res.json({ 
+          return res.json({
             message: "Catégorie modifiée avec succès",
             id: categoryId
           });
         }
-        
+
         res.json(updatedCategory[0]);
       });
     }
@@ -644,7 +644,7 @@ app.delete("/api/categories/:id", authenticateToken, (req, res) => {
         console.error("❌ Erreur suppression catégorie:", err);
         return res.status(500).json({ message: "Erreur serveur" });
       }
-      
+
       if (results.affectedRows === 0) {
         return res.status(404).json({ message: "Catégorie non trouvée" });
       }
@@ -656,13 +656,13 @@ app.delete("/api/categories/:id", authenticateToken, (req, res) => {
 // === PRODUITS ===
 app.get("/api/produits", authenticateToken, (req, res) => {
   const userId = req.user.userId;
-  
+
   conn.query("SELECT * FROM produits WHERE user_id = ?", [userId], (err, results) => {
     if (err) {
       console.error("❌ Erreur récupération produits:", err);
       return res.status(500).json({ message: "Erreur serveur" });
     }
-    
+
     res.json(results);
   });
 });
@@ -680,7 +680,7 @@ app.post("/api/produits", authenticateToken, (req, res) => {
       }
       conn.query("SELECT * FROM produits WHERE id = ?", [results.insertId], (err, newProduit) => {
         if (err) {
-          return res.status(201).json({ 
+          return res.status(201).json({
             message: "Produit créé avec succès",
             produitId: results.insertId
           });
@@ -703,13 +703,13 @@ app.put("/api/produits/:id", authenticateToken, (req, res) => {
         console.error("❌ Erreur modification produit:", err);
         return res.status(500).json({ message: "Erreur serveur" });
       }
-      
+
       if (results.affectedRows === 0) {
         return res.status(404).json({ message: "Produit non trouvé" });
       }
       conn.query("SELECT * FROM produits WHERE id = ?", [produitId], (err, updatedProduit) => {
         if (err) {
-          return res.json({ 
+          return res.json({
             message: "Produit modifié avec succès",
             id: produitId
           });
@@ -734,7 +734,7 @@ app.delete("/api/produits/:id", authenticateToken, (req, res) => {
       if (results.affectedRows === 0) {
         return res.status(404).json({ message: "Produit non trouvé" });
       }
-      
+
       res.json({ message: "Produit supprimé avec succès" });
     }
   );
@@ -743,18 +743,18 @@ app.delete("/api/produits/:id", authenticateToken, (req, res) => {
 // === MOUVEMENTS STOCK ===
 app.get("/api/mouvements", authenticateToken, (req, res) => {
   const userId = req.user.userId;
-  
+
+  // MODIFICATION: Afficher TOUS les mouvements pour le demo (indépendamment du user login)
   const query = `
     SELECT m.*, p.nom as produit_nom, c.nom as categorie_nom, mag.nom as magasin_nom
     FROM mouvements_stock m
     JOIN produits p ON m.produit_id = p.id
     JOIN categories c ON m.categorie_id = c.id
     JOIN magasins mag ON m.magasin_id = mag.id
-    WHERE m.user_id = ?
     ORDER BY m.created_at DESC
   `;
-  
-  conn.query(query, [userId], (err, results) => {
+
+  conn.query(query, [], (err, results) => {
     if (err) {
       console.error("❌ Erreur récupération mouvements:", err);
       return res.status(500).json({ message: "Erreur serveur" });
@@ -766,7 +766,7 @@ app.get("/api/mouvements", authenticateToken, (req, res) => {
 app.post("/api/mouvements", authenticateToken, (req, res) => {
   const userId = req.user.userId;
   const { produit_id, magasin_id, categorie_id, type_mouvement, quantite, prix_unitaire, date_mouvement, motif } = req.body;
-  
+
   conn.query(
     "INSERT INTO mouvements_stock (user_id, produit_id, magasin_id, categorie_id, type_mouvement, quantite, prix_unitaire, date_mouvement, motif) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
     [userId, produit_id, magasin_id, categorie_id, type_mouvement, quantite, prix_unitaire, date_mouvement, motif],
@@ -775,7 +775,7 @@ app.post("/api/mouvements", authenticateToken, (req, res) => {
         console.error("❌ Erreur création mouvement:", err);
         return res.status(500).json({ message: "Erreur serveur" });
       }
-      
+
       // Mettre à jour le stock actuel
       const signe = type_mouvement === 'entree' ? 1 : -1;
       const updateStockQuery = `
@@ -785,9 +785,9 @@ app.post("/api/mouvements", authenticateToken, (req, res) => {
           quantite = quantite + (? * ?),
           valeur_stock = valeur_stock + (? * ? * ?)
       `;
-      
+
       conn.query(updateStockQuery, [
-        userId, produit_id, magasin_id, categorie_id, 
+        userId, produit_id, magasin_id, categorie_id,
         signe * quantite, quantite * prix_unitaire,
         signe, quantite,
         signe, quantite, prix_unitaire
@@ -795,7 +795,7 @@ app.post("/api/mouvements", authenticateToken, (req, res) => {
         if (err) {
           console.error("❌ Erreur mise à jour stock:", err);
         }
-        
+
         conn.query(`
           SELECT m.*, p.nom as produit_nom, c.nom as categorie_nom, mag.nom as magasin_nom
           FROM mouvements_stock m
@@ -805,7 +805,7 @@ app.post("/api/mouvements", authenticateToken, (req, res) => {
           WHERE m.id = ?
         `, [results.insertId], (err, newMouvement) => {
           if (err) {
-            return res.status(201).json({ 
+            return res.status(201).json({
               message: "Mouvement créé avec succès",
               mouvementId: results.insertId
             });
@@ -820,7 +820,7 @@ app.post("/api/mouvements", authenticateToken, (req, res) => {
 // === STOCK ACTUEL ===
 app.get("/api/stock", authenticateToken, (req, res) => {
   const userId = req.user.userId;
-  
+
   const query = `
     SELECT s.*, p.nom as produit_nom, p.code as produit_code, p.type as produit_type,
            c.nom as categorie_nom, mag.nom as magasin_nom
@@ -831,7 +831,7 @@ app.get("/api/stock", authenticateToken, (req, res) => {
     WHERE s.user_id = ?
     ORDER BY s.valeur_stock DESC
   `;
-  
+
   conn.query(query, [userId], (err, results) => {
     if (err) {
       console.error("❌ Erreur récupération stock:", err);
@@ -845,15 +845,15 @@ app.get("/api/stock", authenticateToken, (req, res) => {
 app.get("/api/ventes/stats", authenticateToken, (req, res) => {
   const userId = req.user.userId;
   const { dateDebut, dateFin } = req.query;
-  
+
   let whereClause = "WHERE user_id = ? AND type_mouvement = 'sortie'";
   const params = [userId];
-  
+
   if (dateDebut && dateFin) {
     whereClause += " AND date_mouvement BETWEEN ? AND ?";
     params.push(dateDebut, dateFin);
   }
-  
+
   const query = `
     SELECT 
       COALESCE(SUM(quantite * prix_unitaire), 0) as ca_total,
@@ -864,7 +864,7 @@ app.get("/api/ventes/stats", authenticateToken, (req, res) => {
     FROM mouvements_stock 
     ${whereClause}
   `;
-  
+
   conn.query(query, params, (err, results) => {
     if (err) {
       console.error("❌ Erreur stats ventes:", err);
@@ -876,7 +876,7 @@ app.get("/api/ventes/stats", authenticateToken, (req, res) => {
 
 app.get("/api/ventes/top-produits", authenticateToken, (req, res) => {
   const userId = req.user.userId;
-  
+
   const query = `
     SELECT 
       p.nom, p.code, c.nom as categorie,
@@ -891,7 +891,7 @@ app.get("/api/ventes/top-produits", authenticateToken, (req, res) => {
     ORDER BY ca_produit DESC
     LIMIT 5
   `;
-  
+
   conn.query(query, [userId], (err, results) => {
     if (err) {
       console.error("❌ Erreur top produits:", err);
@@ -903,7 +903,7 @@ app.get("/api/ventes/top-produits", authenticateToken, (req, res) => {
 
 app.get("/api/ventes/evolution-ca", authenticateToken, (req, res) => {
   const userId = req.user.userId;
-  
+
   const query = `
     SELECT 
       DATE(date_mouvement) as date,
@@ -914,7 +914,7 @@ app.get("/api/ventes/evolution-ca", authenticateToken, (req, res) => {
     GROUP BY DATE(date_mouvement)
     ORDER BY date ASC
   `;
-  
+
   conn.query(query, [userId], (err, results) => {
     if (err) {
       console.error("❌ Erreur évolution CA:", err);
@@ -926,7 +926,7 @@ app.get("/api/ventes/evolution-ca", authenticateToken, (req, res) => {
 
 app.get("/api/ventes/par-categorie", authenticateToken, (req, res) => {
   const userId = req.user.userId;
-  
+
   const query = `
     SELECT 
       c.nom as categorie,
@@ -943,7 +943,7 @@ app.get("/api/ventes/par-categorie", authenticateToken, (req, res) => {
     GROUP BY c.id, c.nom
     ORDER BY ca DESC
   `;
-  
+
   conn.query(query, [userId, userId], (err, results) => {
     if (err) {
       console.error("❌ Erreur ventes par catégorie:", err);
@@ -955,7 +955,7 @@ app.get("/api/ventes/par-categorie", authenticateToken, (req, res) => {
 
 app.get("/api/ventes/recentes", authenticateToken, (req, res) => {
   const userId = req.user.userId;
-  
+
   const query = `
     SELECT 
       p.nom as produit,
@@ -969,7 +969,7 @@ app.get("/api/ventes/recentes", authenticateToken, (req, res) => {
     ORDER BY m.created_at DESC
     LIMIT 10
   `;
-  
+
   conn.query(query, [userId], (err, results) => {
     if (err) {
       console.error("❌ Erreur ventes récentes:", err);
@@ -982,13 +982,13 @@ app.get("/api/ventes/recentes", authenticateToken, (req, res) => {
 // === CONTACT ===
 app.post("/api/contact", (req, res) => {
   const { name, email, company, subject, message } = req.body;
-  
+
   console.log("📥 Nouveau message de contact reçu:", { name, email, subject });
-  
+
   if (!name || !email || !subject || !message) {
     return res.status(400).json({ message: "Tous les champs obligatoires doivent être remplis" });
   }
-  
+
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
     return res.status(400).json({ message: "Format d'email invalide" });
@@ -1003,10 +1003,10 @@ app.post("/api/contact", (req, res) => {
         console.error("❌ Erreur insertion contact:", err);
         return res.status(500).json({ message: "Erreur lors de l'envoi du message" });
       }
-      
+
       console.log("✅ Message de contact sauvegardé - ID:", results.insertId);
       const contactId = results.insertId;
-      
+
       // 2. Envoyer un email de confirmation à l'utilisateur
       const userMailOptions = {
         from: process.env.CONTACT_FROM_EMAIL || process.env.GMAIL_USER,
@@ -1039,7 +1039,7 @@ app.post("/api/contact", (req, res) => {
           </div>
         `
       };
-      
+
       // 3. Envoyer un email à votre adresse personnelle
       const adminMailOptions = {
         from: process.env.CONTACT_FROM_EMAIL || process.env.GMAIL_USER,
@@ -1083,7 +1083,7 @@ app.post("/api/contact", (req, res) => {
           </div>
         `
       };
-      
+
       // Envoyer les deux emails
       transporter.sendMail(userMailOptions, (error, info) => {
         if (error) {
@@ -1092,7 +1092,7 @@ app.post("/api/contact", (req, res) => {
           console.log("✅ Email de confirmation envoyé à:", email);
         }
       });
-      
+
       transporter.sendMail(adminMailOptions, (error, info) => {
         if (error) {
           console.error("❌ Erreur envoi email admin:", error);
@@ -1100,8 +1100,8 @@ app.post("/api/contact", (req, res) => {
           console.log("✅ Email admin envoyé à:", process.env.CONTACT_DESTINATION_EMAIL || process.env.GMAIL_USER);
         }
       });
-      
-      res.status(201).json({ 
+
+      res.status(201).json({
         message: "Message envoyé avec succès ! Vous recevrez une confirmation par email.",
         contactId: contactId,
         success: true
@@ -1113,13 +1113,13 @@ app.post("/api/contact", (req, res) => {
 // === Liste publique de catégories (sans auth) ===
 app.get("/categories", (req, res) => {
   console.log("📥 Requête /categories reçue");
-  
+
   conn.query("SELECT * FROM categories", (err, rows) => {
     if (err) {
       console.error("❌ Erreur SQL:", err);
       return res.status(500).json({ error: err.message });
     }
-    
+
     console.log(`✅ ${rows.length} catégories trouvées`);
     res.json(rows);
   });
@@ -1132,7 +1132,7 @@ app.get("/api/contacts", authenticateToken, (req, res) => {
       console.error("❌ Erreur récupération contacts:", err);
       return res.status(500).json({ message: "Erreur serveur" });
     }
-    
+
     res.json({ contacts: results });
   });
 });
